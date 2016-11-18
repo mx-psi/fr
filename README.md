@@ -1,6 +1,6 @@
 # fr
 
-Exposición para los seminarios de Fundamentos de Redes
+## Exposición para los seminarios de Fundamentos de Redes
 
 - **Grupo**: 3
 - **Tema**: HTTP Live Streaming (HLS)
@@ -10,3 +10,15 @@ Exposición para los seminarios de Fundamentos de Redes
 - Correos desde cuenta oficial con asunto empezando por `[FR][DG]`
 - Mandar todo el repo
 - En torno a 20-30 minutos de exposición
+
+
+## Programa para la práctica 2
+
+Realizar un programa de mensajería instantánea con estructura cliente-servidor con capacidad para:
+
+- Nombres de usuario
+- Grupos (uno en cada hebra)
+- Mandar ficheros/imágenes/datos que no sean texto
+- Contraseñas (con hash (y salt))?
+
+Una posibilidad es hacer una simplificación de XMPP
