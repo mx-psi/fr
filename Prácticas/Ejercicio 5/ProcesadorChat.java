@@ -16,24 +16,24 @@ public class ProcesadorChat extends Thread {
 	public ProcesadorChat(Socket socket) {
 		this.socket=socket;
 	}
-	
+
 	public void run(){
 
 		byte [] datosRecibidos=new byte[1024];
 		int bytesRecibidos=0;
 		byte [] datosEnviar;
-			
+
 		try {
 			// Obtiene los flujos de escritura/lectura
 			inReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			outPrinter = new PrintWriter(socket.getOutputStream(),true);
-			
+
 			String peticion= inReader.readLine();
 			String respuesta= "TODO";
 			outPrinter.println(respuesta);
-			
+
 		} catch (IOException e) {
-			System.err.println("Error al obtener los flujso de entrada/salida.");
+			System.err.println("Error al obtener los flujos de entrada/salida.");
 		}
 	}
 }
