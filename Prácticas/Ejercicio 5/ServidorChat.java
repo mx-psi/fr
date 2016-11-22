@@ -20,21 +20,14 @@ public class ServidorChat {
 
   // Escucha nuevos clientes
   private static void keepListening() {
-    int nuevoCliente;
-    while ((nuevoCliente = addClient()) + 1 < maxClientes)
-      sendLoginData(nuevoCliente);
+    while (addClient() + 1 < maxClientes);
   }
 
   // Añade un cliente
   private static int addClient() {
     clientes[siguienteId] = new Cliente(siguienteId, socketServidor);
+    clientes[siguienteId].start();
     return siguienteId++;
-  }
-
-  // Manda información a un cliente tras su conexión
-  private static void sendLoginData(int id) {
-    ProcesadorChat procesador=new ProcesadorChat(clientes[id].getSocket());
-    procesador.start();
   }
   
 	public static void main(String[] args) {
