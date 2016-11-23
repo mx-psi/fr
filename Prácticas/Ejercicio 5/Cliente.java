@@ -1,18 +1,13 @@
-import java.io.IOException;
-import java.net.ServerSocket;
+import java.io.IOException;   // De momento no se usa, pero probablemente termine siendo necesario
 import java.net.Socket;
 
 public class Cliente extends Thread {
   private int id;
   private Socket socket = null;
 
-  public Cliente(int id, ServerSocket socketServidor) {
+  public Cliente(int id, Socket socket) {
     this.id = id;
-    try {
-      socket = socketServidor.accept();
-    } catch(IOException e) {
-      System.out.println("Error: no se pudo aceptar la conexión solicitada (id = " + id + ")");
-    }
+    this.socket = socket;
   }
 
   public int getClientId() {
