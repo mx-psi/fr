@@ -1,5 +1,4 @@
-import java.io.IOException;
-import java.net.ServerSocket;
+import java.io.IOException;   // De momento no se usa, pero probablemente termine siendo necesario
 import java.net.Socket;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,13 +12,9 @@ public class Cliente extends Thread {
   private PrintWriter outPrinter;
  	private BufferedReader inReader;
 
-  public Cliente(int id, ServerSocket socketServidor) {
+  public Cliente(int id, Socket socket) {
     this.id = id;
-    try {
-      socket = socketServidor.accept();
-    } catch(IOException e) {
-      System.out.println("Error: no se pudo aceptar la conexión solicitada (id = " + id + ")");
-    }
+    this.socket = socket;
     try {
       outPrinter = new PrintWriter(socket.getOutputStream(), true);
       inReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));

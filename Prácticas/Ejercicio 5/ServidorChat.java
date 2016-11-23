@@ -25,8 +25,12 @@ public class ServidorChat {
 
   // Añade un cliente
   private static int addClient() {
-    clientes[siguienteId] = new Cliente(siguienteId, socketServidor);
-    clientes[siguienteId].start();
+    try {
+      clientes[siguienteId] = new Cliente(siguienteId, socketServidor.accept());
+      clientes[siguienteId].start();
+    } catch(IOException e) {
+      System.out.println("Error: no se pudo aceptar la conexión solicitada (id = " + siguienteId + ")");
+    }
     return siguienteId++;
   }
   
