@@ -30,6 +30,10 @@ public class ServidorChat {
     return siguienteId++;
   }
   
+  public static void sendMessage(int id, String message){
+    clientes[id].sendMessage(message);
+  }
+  
 	public static void main(String[] args) {
     if (args.length >= 1)
       port = Integer.parseInt(args[0]);
