@@ -13,18 +13,19 @@ import java.util.Scanner;
 public class ClienteChat {
   
   private static void parse(String mensaje){
-    int codigo = Integer.parseInt(mensaje.substring(0,4));
-    String[] datos = mensaje.substring(4).split(";");
-    
+    try{
+      int codigo = Integer.parseInt(mensaje.substring(0,4));
+      String[] datos = mensaje.substring(4).split(";");
+
     switch(codigo){
       case 2001: 
-        System.out.println("Error: El usuario " + datos[0] + "no existe");
+        System.err.println("Error: El usuario " + datos[0] + "no existe");
         break;
       case 2002: 
-        System.out.println("Error: El grupo " + datos[0] + "no existe");
+        System.err.println("Error: El grupo " + datos[0] + "no existe");
         break;
       case 2004:
-        System.out.println("Error: El último mensaje estaba mal formado");
+        System.err.println("Error: El último mensaje estaba mal formado");
         break;
       case 1004:
         printMessage(Integer.parseInt(datos[0]),datos[1],datos[2],null);
@@ -33,9 +34,16 @@ public class ClienteChat {
         printMessage(Integer.parseInt(datos[0]),datos[2],datos[3],datos[1]);
         break;
       default: 
-        System.out.println("Error: Tipo de mensaje no reconocido");
+        System.err.println("Error: Tipo de mensaje no reconocido");
         break;
     }
+    } catch(java.lang.ArrayIndexOutOfBoundsException e){
+      System.err.println("Error: Mensaje mal formado \""+ mensaje +"\"");
+    }
+    catch(NumberFormatException e){
+      System.err.println("Error: Código mal formado \""+ mensaje +"\"");
+    }
+
   }
   
   // Imprime mensaje

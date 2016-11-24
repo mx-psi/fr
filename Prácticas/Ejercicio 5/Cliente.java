@@ -75,12 +75,14 @@ public class Cliente extends Thread {
   
   // Evalúa el mensaje y actúa en consecuencia
   private void parse(String mensaje){
+    try{
     int codigo = Integer.parseInt(mensaje.substring(0,4));
     String[] datos = mensaje.substring(4).split(";");
     
     switch(codigo){
       case 1001: 
-        ServidorChat.sendMessageToClient(Integer.parseInt(datos[0]),datos[1],datos[2]);
+        if(!ServidorChat.sendMessageToClient("1004", Integer.parseInt(datos[0]),datos[1]+";"+datos[2]))
+              ServidorChat.sendMessageToClient("2001", id, "");
         break;
       case 1002: 
         // Envía mensaje a grupo
@@ -89,8 +91,17 @@ public class Cliente extends Thread {
         // Añade usuario al grupo
         break;
       default: 
-        // Error, mensaje no reconocido
+        System.err.println("Error: Código no reconocido \""+ codigo +"\"");
+        ServidorChat.sendMessageToClient("2004",id, "");
         break;
+    }
+    } catch(java.lang.ArrayIndexOutOfBoundsException e){
+      System.err.println("Error: Mensaje mal formado \""+ mensaje +"\"");
+      ServidorChat.sendMessageToClient("2004", id, "");
+    }
+    catch(NumberFormatException e){
+      System.err.println("Error: Código mal formado \""+ mensaje +"\"");
+      ServidorChat.sendMessageToClient("2004", id, "");
     }
   }
 }

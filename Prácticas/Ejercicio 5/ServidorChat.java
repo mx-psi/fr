@@ -35,10 +35,10 @@ public class ServidorChat {
   }
   
   // Envía un mensaje al cliente con id "id"
-  public static boolean sendMessageToClient(int id, String date, String message){
+  public static boolean sendMessageToClient(String codigo, int id, String message){
     if(clientes[id] == null)
       return false;
-    clientes[id].sendMessage("1004" + id + ";" + date  + ";" + message);
+    clientes[id].sendMessage(codigo + id + ";" + message);
     return true;
   }
   
