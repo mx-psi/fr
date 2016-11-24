@@ -1,4 +1,5 @@
-import java.io.IOException;   // De momento no se usa, pero probablemente termine siendo necesario
+import java.io.IOException;
+import java.util.IllegalFormatException;
 import java.net.Socket;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -7,25 +8,27 @@ import java.io.BufferedReader;
 import java.io.PrintWriter;
 
 public class Cliente extends Thread {
-  private int id;
+  private final String name;
   private Socket socket = null;
   private PrintWriter outPrinter;
  	private BufferedReader inReader;
 
-  public Cliente(int id, Socket socket) {
-    this.id = id;
+  public Cliente(Socket socket) throws IOException, IllegalNameException {
     this.socket = socket;
-    try {
-      outPrinter = new PrintWriter(socket.getOutputStream(), true);
-      inReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-    }
-    catch (IOException e) {
-			System.err.println("Error al obtener los flujos de entrada/salida.");
-		}
+
+    outPrinter = new PrintWriter(socket.getOutputStream(), true);
+    inReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+    String primerMensaje = inReader.readLine();
+
+    String codigo = primerMensaje.substring(0,4);
+    if (codigo == "1004" && primerMensaje.length() <= 24)
+      name = primerMensaje.substring(4);
+    else
+      throw new IllegalNameException(primerMensaje);
   }
 
-  public int getClientId() {
-    return id;
+  public String getClientName() {
+    return name;
   }
 
   public Socket getSocket() {
@@ -39,7 +42,7 @@ public class Cliente extends Thread {
     listen();
   }
 
-  // Recibe el nombre de usuario (y tal vez más datos) del cliente
+  // Recibe datos del cliente
   private boolean getLoginInfo() {
     return true;  // TODO
   }
@@ -51,7 +54,7 @@ public class Cliente extends Thread {
   
   // Envía el mensaje mensaje al cliente
   public void sendMessage(String mensaje){
-    System.out.println("Enviando mensaje al cliente " + id);
+    System.out.println("Enviando mensaje al cliente " + name);
    	outPrinter.println(mensaje);
   }
   
@@ -62,46 +65,47 @@ public class Cliente extends Thread {
     try{
       while(mensaje != null){
         mensaje = inReader.readLine();
-        System.out.println("Recibido: \"" + mensaje + "\" del cliente " + id);
+        System.out.println("Recibido: \"" + mensaje + "\" del cliente " + name);
         if(mensaje != null)
           parse(mensaje);
       }
    	} catch (IOException e) {
-			System.err.println("Error en la recepción del cliente (id = " + id + ")");
+			System.err.println("Error en la recepción del cliente (name = " + name + ")");
 		}
 		
-		System.out.println("El cliente id = " + id + " se ha desconectado");
+		System.out.println("El cliente " + name + " se ha desconectado");
   }
   
   // Evalúa el mensaje y actúa en consecuencia
   private void parse(String mensaje){
     try{
-    int codigo = Integer.parseInt(mensaje.substring(0,4));
+    int codigo = Integer.parseInt(mensaje.substring(0,4), 10);
     String[] datos = mensaje.substring(4).split(";");
     
     switch(codigo){
       case 1001: 
-        if(!ServidorChat.sendMessageToClient("1004", Integer.parseInt(datos[0]),datos[1]+";"+datos[2]))
-              ServidorChat.sendMessageToClient("2001", id, "");
+        if(!ServidorChat.sendMessageToClient("1004", datos[0], name + ";" + datos[1] + ";" + datos[2]))
+          ServidorChat.sendMessageToClient("2001", name, datos[0]);
         break;
       case 1002: 
-        // Envía mensaje a grupo
+        if (!ServidorChat.sendMessageToGroup("1005", datos[0], name + ";" + datos[1] + ";" + datos[2]))
+          ServidorChat.sendMessageToClient("2002", name, datos[0]);
         break;
       case 1003: 
-        // Añade usuario al grupo
+        ServidorChat.addClientToGroup(datos[0], datos[1], name);
         break;
       default: 
         System.err.println("Error: Código no reconocido \""+ codigo +"\"");
-        ServidorChat.sendMessageToClient("2004",id, "");
+        ServidorChat.sendMessageToClient("2004", name, "");
         break;
     }
     } catch(java.lang.ArrayIndexOutOfBoundsException e){
       System.err.println("Error: Mensaje mal formado \""+ mensaje +"\"");
-      ServidorChat.sendMessageToClient("2004", id, "");
+      ServidorChat.sendMessageToClient("2004", name, "");
     }
     catch(NumberFormatException e){
       System.err.println("Error: Código mal formado \""+ mensaje +"\"");
-      ServidorChat.sendMessageToClient("2004", id, "");
+      ServidorChat.sendMessageToClient("2004", name, "");
     }
   }
 }

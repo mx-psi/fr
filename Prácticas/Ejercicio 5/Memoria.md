@@ -25,19 +25,22 @@ Para dar soporte a este servicio el protocolo implementado consta de 4 tipos de 
 
 | **Código** | **Cuerpo** | **Descripción**|
 |------------|------------|----------------|
-| 1001       | *id* + ; + *time* + ; + *contenido* | Solicita el envío de *contenido* al **usuario** con identificador *id*|
-| 1002       | *id* + ; + *time* + ; + *contenido* | Solicita el envío de *contenido* al **grupo** con identificador *id*|
-| 1003       | *groupname* + ; + *usuario*| El cliente solicita que se añada *usuario* a *groupname*. Si el grupo no existe se creará.|
+| 1001       | *username* + ; + *time* + ; + *contenido* | Solicita el envío de *contenido* al **usuario** de nombre *username* |
+| 1002       | *groupname* + ; + *time* + ; + *contenido* | Solicita el envío de *contenido* al **grupo** de nombre *groupname* |
+| 1003       | *groupname* + ; + *username*| El cliente solicita que se añada *username* a *groupname*. Si el grupo no existe se creará. |
+| 1004       | *username* | El cliente solicita que su nombre sea *uesrname*. |
 
 ## Servidor
 
 | **Código** | **Cuerpo** | **Descripción** |
 |------------|------------|-----------------|
-| 2001 | *id* | El usuario *id* no existe |
-| 2002 | *id* | El grupo *id* no existe |
+| 2001 | *username* | El usuario *username* no existe |
+| 2002 | *groupname* | El grupo *groupname* no existe |
 | 2003 | *tipo* | El tipo *tipo* no se ha reconocido como un tipo de mensaje válido |
 | 2004 | *ERROR* | El último mensaje enviado estaba mal formado |
-| 1004 | *id* + ; + *time* + ; + *mensaje* | El usuario *id* ha enviado (en el grupo *group*) en el tiempo *time* el mensaje *mensaje* |
-| 1005 | *id* + ; + *group* + ; + *time* + ; + *mensaje* | El usuario *id* ha enviado (en el grupo *group*) en el tiempo *time* el mensaje *mensaje* |
+| 2005 | *groupname* | *username* | El usuario *username* ya estaba en el grupo *groupname* |
+| 2006 | *groupname* | El grupo *groupname* está lleno |
+| 1004 | *username* + ; + *time* + ; + *mensaje* | El usuario *username* ha enviado en el tiempo *time* el mensaje *mensaje* |
+| 1005 | *groupname* + ; + *username* + ; + *time* + ; + *mensaje* | El usuario *username* ha enviado (en el grupo *groupname*) en el tiempo *time* el mensaje *mensaje* |
 
 # Evaluación de la aplicación
