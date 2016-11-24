@@ -21,7 +21,7 @@ public class Cliente extends Thread {
     String primerMensaje = inReader.readLine();
 
     String codigo = primerMensaje.substring(0,4);
-    if (codigo == "1004" && primerMensaje.length() <= 24)
+    if (codigo.equals("1004") && primerMensaje.length() <= 24)
       name = primerMensaje.substring(4);
     else
       throw new IllegalNameException(primerMensaje);

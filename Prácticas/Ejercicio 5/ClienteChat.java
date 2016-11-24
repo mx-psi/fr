@@ -14,24 +14,24 @@ public class ClienteChat {
   
   private static void parse(String mensaje){
     try{
-      int codigo = Integer.parseInt(mensaje.substring(0,4));
+      int codigo = Integer.parseInt(mensaje.substring(0,4), 10);
       String[] datos = mensaje.substring(4).split(";");
 
     switch(codigo){
       case 2001: 
-        System.err.println("Error: El usuario " + datos[0] + "no existe");
+        System.err.println("Error: El usuario " + datos[0] + " no existe");
         break;
       case 2002: 
-        System.err.println("Error: El grupo " + datos[0] + "no existe");
+        System.err.println("Error: El grupo " + datos[0] + " no existe");
         break;
       case 2004:
         System.err.println("Error: El último mensaje estaba mal formado");
         break;
       case 1004:
-        printMessage(Integer.parseInt(datos[0]),datos[1],datos[2],null);
+        printMessage(datos[0],datos[1],datos[2],null);
         break;
       case 1005:
-        printMessage(Integer.parseInt(datos[0]),datos[2],datos[3],datos[1]);
+        printMessage(datos[1], datos[2],datos[3],datos[0]);
         break;
       default: 
         System.err.println("Error: Tipo de mensaje no reconocido");
@@ -46,18 +46,15 @@ public class ClienteChat {
 
   }
   
-  // Imprime mensaje
-  private static void printMessage(int id, String date, String mensaje, String grupo){
-    System.out.println("Cliente " + id + " dice: " + mensaje);
-    if(grupo != null)
-      System.out.println("\ten el grupo " + grupo);
-    System.out.println("\ta las " + date);
+  // Imprime un mensaje de un usuario
+  private static void printMessage(String usuario, String date, String mensaje, String grupo) {
+    System.out.println("[" + date + "]" + (grupo == null ? "" : " (" + grupo + ")")
+                        + " " + usuario + ": " + mensaje);
   }
-  
+
 	public static void main(String[] args) {
 		String buferEnvio;
 		String buferRecepcion;
-		int bytesLeidos=0;
     Scanner scanner = new Scanner(System.in);
 
 		String host = "localhost";
@@ -72,6 +69,9 @@ public class ClienteChat {
     else if (!nl.isEmpty())
       host = nl;
 
+    System.out.print("Escoge un nombre de usuario: ");
+    String nombre = scanner.nextLine();
+
 		Socket socketServicio=null;
 
 		try {
@@ -79,8 +79,9 @@ public class ClienteChat {
 
       BufferedReader inReader = new BufferedReader(new InputStreamReader(socketServicio.getInputStream()));
 			PrintWriter outPrinter = new PrintWriter(socketServicio.getOutputStream(),true);
-      
-   	  buferEnvio="10010;fecha;Esto es un mensaje de prueba";
+
+      outPrinter.println("1004" + nombre);
+   	  buferEnvio="1001NombreDePrueba;11:22:33;Esto es un mensaje de prueba";
  			outPrinter.println(buferEnvio);
  			
    		System.out.println("Esperando mensaje del servidor...");

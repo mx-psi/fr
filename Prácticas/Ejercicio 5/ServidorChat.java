@@ -38,7 +38,7 @@ public class ServidorChat {
     } catch(IOException e) {
       System.out.println("Error: no se pudo aceptar la conexión solicitada (nombre = " + nombre + ")");
     } catch(IllegalNameException e) {
-      System.out.println("Error: solicitud de nombre inválida (nombre = " + e.what() + ")");
+      System.out.println("Error: solicitud de nombre inválida (mensaje = " + e.what() + ")");
     }
   }
 
@@ -60,7 +60,7 @@ public class ServidorChat {
     if (!clientes.containsKey(destino))
       return false;
 
-    clientes.get(destino).sendMessage(codigo + destino + ";" + message);
+    clientes.get(destino).sendMessage(codigo + message);
     return true;
   }
   
