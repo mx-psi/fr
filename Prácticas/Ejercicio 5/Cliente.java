@@ -63,21 +63,22 @@ public class Cliente extends Thread {
     String mensaje = "";
     
     try{
-      while(mensaje != null){
+      while(mensaje != null) {
         mensaje = inReader.readLine();
         System.out.println("Recibido: \"" + mensaje + "\" del cliente " + name);
         if(mensaje != null)
-          parse(mensaje);
+          if (!parse(mensaje))
+            mensaje = null;
       }
    	} catch (IOException e) {
 			System.err.println("Error en la recepción del cliente (name = " + name + ")");
 		}
-		
+
 		System.out.println("El cliente " + name + " se ha desconectado");
   }
   
-  // Evalúa el mensaje y actúa en consecuencia
-  private void parse(String mensaje){
+  // Evalúa el mensaje y actúa en consecuencia. Devuelve false si se debe cerrar la conexión
+  private boolean parse(String mensaje){
     try{
     int codigo = Integer.parseInt(mensaje.substring(0,4), 10);
     String[] datos = mensaje.substring(4).split(";");
@@ -94,6 +95,12 @@ public class Cliente extends Thread {
       case 1003: 
         ServidorChat.addClientToGroup(datos[0], datos[1], name);
         break;
+      case 1999:
+        // TODO: avisar a otros clientes de la desconexión
+        try {
+          socket.shutdownOutput();
+        } catch (IOException e) {}
+        return false;
       default: 
         System.err.println("Error: Código no reconocido \""+ codigo +"\"");
         ServidorChat.sendMessageToClient("2004", name, "");
@@ -107,5 +114,6 @@ public class Cliente extends Thread {
       System.err.println("Error: Código mal formado \""+ mensaje +"\"");
       ServidorChat.sendMessageToClient("2004", name, "");
     }
+    return true;
   }
 }
