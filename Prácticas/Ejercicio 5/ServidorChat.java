@@ -34,8 +34,12 @@ public class ServidorChat {
     return siguienteId++;
   }
   
-  public static void sendMessage(int id, String message){
-    clientes[id].sendMessage(message);
+  // Envía un mensaje al cliente con id "id"
+  public static boolean sendMessageToClient(int id, String date, String message){
+    if(clientes[id] == null)
+      return false;
+    clientes[id].sendMessage("1004" + id + ";" + date  + ";" + message);
+    return true;
   }
   
 	public static void main(String[] args) {

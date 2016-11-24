@@ -11,6 +11,41 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 
 public class ClienteChat {
+  
+  private static void parse(String mensaje){
+    int codigo = Integer.parseInt(mensaje.substring(0,4));
+    String[] datos = mensaje.substring(4).split(";");
+    
+    switch(codigo){
+      case 2001: 
+        System.out.println("Error: El usuario " + datos[0] + "no existe");
+        break;
+      case 2002: 
+        System.out.println("Error: El grupo " + datos[0] + "no existe");
+        break;
+      case 2004:
+        System.out.println("Error: El último mensaje estaba mal formado");
+        break;
+      case 1004:
+        printMessage(Integer.parseInt(datos[0]),datos[1],datos[2],null);
+        break;
+      case 1005:
+        printMessage(Integer.parseInt(datos[0]),datos[2],datos[3],datos[1]);
+        break;
+      default: 
+        System.out.println("Error: Tipo de mensaje no reconocido");
+        break;
+    }
+  }
+  
+  // Imprime mensaje
+  private static void printMessage(int id, String date, String mensaje, String grupo){
+    System.out.println("Cliente " + id + " dice: " + mensaje);
+    if(grupo != null)
+      System.out.println("\ten el grupo " + grupo);
+    System.out.println("\ta las " + date);
+  }
+  
 	public static void main(String[] args) {
 		String buferEnvio;
 		String buferRecepcion;
@@ -36,14 +71,14 @@ public class ClienteChat {
 
       BufferedReader inReader = new BufferedReader(new InputStreamReader(socketServicio.getInputStream()));
 			PrintWriter outPrinter = new PrintWriter(socketServicio.getOutputStream(),true);
-
-			buferEnvio="Al monte del volcán debes ir sin demora";
-			outPrinter.println(buferEnvio);
-
-			buferRecepcion = inReader.readLine();
-			System.out.println("Recibido: ");
-			System.out.println(buferRecepcion);
-
+      
+   	  buferEnvio="10010;fecha;Esto es un mensaje de prueba";
+ 			outPrinter.println(buferEnvio);
+ 			
+   		System.out.println("Esperando mensaje del servidor...");
+  		buferRecepcion = inReader.readLine();
+  		parse(buferRecepcion);
+     	
       socketServicio.close();
 		} catch (UnknownHostException e) {
 			System.err.println("Error: Nombre de host no encontrado.");

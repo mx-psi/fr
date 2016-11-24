@@ -25,16 +25,19 @@ Para dar soporte a este servicio el protocolo implementado consta de 4 tipos de 
 
 | **Código** | **Cuerpo** | **Descripción**|
 |------------|------------|----------------|
-| 1002       | **SEND** + *id* + tipo + *contenido* | Solicita el envío de *contenido* al usuario o grupo con identificador *id*|
-| 1003       | **ADD** + *groupname* + **USER** + *usuario*| El cliente solicita que se añada *usuario* a *groupname*. Si el grupo no existe se creará.|
+| 1001       | *id* + ; + *time* + ; + *contenido* | Solicita el envío de *contenido* al **usuario** con identificador *id*|
+| 1002       | *id* + ; + *time* + ; + *contenido* | Solicita el envío de *contenido* al **grupo** con identificador *id*|
+| 1003       | *groupname* + ; + *usuario*| El cliente solicita que se añada *usuario* a *groupname*. Si el grupo no existe se creará.|
 
 ## Servidor
 
 | **Código** | **Cuerpo** | **Descripción** |
 |------------|------------|-----------------|
-| 2001 | **ERROR** + *id* | El usuario *id* no existe o no se encuentra conectado en este momento |
-| 2002 | **ERROR** + *id* | El grupo *id* no existe |
-| 2003 | **ERROR** + *tipo* | El tipo *tipo* no se ha reconocido como un tipo de mensaje válido |
-| 1004 | **MESSAGE** + *id* + (**AT** + *group*) + **TIME** + *time* + *mensaje* | El usuario *id* ha enviado (en el grupo *group*) en el tiempo *time* el mensaje *mensaje* |
+| 2001 | *id* | El usuario *id* no existe |
+| 2002 | *id* | El grupo *id* no existe |
+| 2003 | *tipo* | El tipo *tipo* no se ha reconocido como un tipo de mensaje válido |
+| 2004 | *ERROR* | El último mensaje enviado estaba mal formado |
+| 1004 | *id* + ; + *time* + ; + *mensaje* | El usuario *id* ha enviado (en el grupo *group*) en el tiempo *time* el mensaje *mensaje* |
+| 1005 | *id* + ; + *group* + ; + *time* + ; + *mensaje* | El usuario *id* ha enviado (en el grupo *group*) en el tiempo *time* el mensaje *mensaje* |
 
 # Evaluación de la aplicación

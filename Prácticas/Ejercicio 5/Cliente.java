@@ -47,29 +47,50 @@ public class Cliente extends Thread {
   // Se llama tras un acceso correcto
   private void login() {
     // TODO. Podría mandar una lista de usuarios y/o avisar al resto de usuarios
-    // Lo siguiente es temporal, para que se comporte como el ejercicio 3
-    ProcesadorChat procesador=new ProcesadorChat(socket);
-    procesador.start();
   }
   
   // Envía el mensaje mensaje al cliente
   public void sendMessage(String mensaje){
+    System.out.println("Enviando mensaje al cliente " + id);
    	outPrinter.println(mensaje);
   }
-
+  
+  // Escucha los mensajes
   private void listen() {
-    //TODO: Versión de prueba para ver si funciona
     String mensaje = "";
     
     try{
       while(mensaje != null){
         mensaje = inReader.readLine();
-        System.out.println("Recibido el paquete " + mensaje);
+        System.out.println("Recibido: \"" + mensaje + "\" del cliente " + id);
+        if(mensaje != null)
+          parse(mensaje);
       }
    	} catch (IOException e) {
 			System.err.println("Error en la recepción del cliente (id = " + id + ")");
 		}
 		
-		System.out.println("Recibido mensaje nulo del cliente (id = " + id + ")");
+		System.out.println("El cliente id = " + id + " se ha desconectado");
+  }
+  
+  // Evalúa el mensaje y actúa en consecuencia
+  private void parse(String mensaje){
+    int codigo = Integer.parseInt(mensaje.substring(0,4));
+    String[] datos = mensaje.substring(4).split(";");
+    
+    switch(codigo){
+      case 1001: 
+        ServidorChat.sendMessageToClient(Integer.parseInt(datos[0]),datos[1],datos[2]);
+        break;
+      case 1002: 
+        // Envía mensaje a grupo
+        break;
+      case 1003: 
+        // Añade usuario al grupo
+        break;
+      default: 
+        // Error, mensaje no reconocido
+        break;
+    }
   }
 }
