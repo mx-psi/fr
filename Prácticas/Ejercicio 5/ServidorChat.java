@@ -1,11 +1,12 @@
 import java.io.IOException;
+import java.util.HashMap;
 import java.net.ServerSocket;
 
 public class ServidorChat {
   private static int port = 8989; // Puerto por defecto, puede cambiarse en los parámetros
   private static ServerSocket socketServidor;
-  private static Cliente[] clientes;
-  private static final int maxClientes = 65536;
+  private static HashMap<Integer, Cliente> clientes;
+  private static final int maxExpectedClients = 32768;
   private static int siguienteId = 0;
 
   private static boolean initializeServerSocket() {
@@ -20,14 +21,15 @@ public class ServidorChat {
 
   // Escucha nuevos clientes
   private static void keepListening() {
-    while (addClient() + 1 < maxClientes);
+    while (true)
+      addClient();
   }
 
   // Añade un cliente
   private static int addClient() {
     try {
-      clientes[siguienteId] = new Cliente(siguienteId, socketServidor.accept());
-      clientes[siguienteId].start();
+      clientes.put(siguienteId, new Cliente(siguienteId, socketServidor.accept()));
+      clientes.get(siguienteId).start();
     } catch(IOException e) {
       System.out.println("Error: no se pudo aceptar la conexión solicitada (id = " + siguienteId + ")");
     }
@@ -36,9 +38,9 @@ public class ServidorChat {
   
   // Envía un mensaje al cliente con id "id"
   public static boolean sendMessageToClient(String codigo, int id, String message){
-    if(clientes[id] == null)
+    if(!clientes.containsKey(id))
       return false;
-    clientes[id].sendMessage(codigo + id + ";" + message);
+    clientes.get(id).sendMessage(codigo + id + ";" + message);
     return true;
   }
   
@@ -46,7 +48,7 @@ public class ServidorChat {
     if (args.length >= 1)
       port = Integer.parseInt(args[0]);
 
-    clientes = new Cliente[maxClientes];
+    clientes = new HashMap(2*maxExpectedClients, (float) 1/2);
     if (initializeServerSocket()) {
       System.out.println("Esperando conexiones a través del puerto " + port + "...");
       keepListening();
