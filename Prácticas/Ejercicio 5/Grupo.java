@@ -13,11 +13,13 @@ public class Grupo {
 		clientes = new ArrayList<Cliente>();
     addMember(creador);
 	}
-
+  
+  // Obtiene el nombre del grupo
   public String getName() {
     return groupName;
   }
-
+  
+  // Envía mensaje a todos los clientes del grupo
   public void sendMessage(String mensaje) {
     for (Cliente c:clientes)
       c.sendMessage("1005" + getName() + ";" + c.getClientName() + ";" + mensaje);

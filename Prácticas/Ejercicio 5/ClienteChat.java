@@ -42,10 +42,10 @@ class Escuchador extends Thread {
           System.err.println("Error: El último mensaje estaba mal formado");
           break;
         case 1004:
-          printMessage(datos[0],datos[1],datos[2],null);
+          Contactos.addMensaje(datos[0], new Mensaje(datos[0],datos[1],datos[2]));
           break;
         case 1005:
-          printMessage(datos[1], datos[2],datos[3],datos[0]);
+          Contactos.addMensaje(datos[1], new Mensaje(datos[1],datos[2],datos[3],datos[0]));
           break;
         default: 
           System.err.println("Error: Tipo de mensaje no reconocido");
@@ -57,12 +57,6 @@ class Escuchador extends Thread {
     catch(NumberFormatException e){
       System.err.println("Error: Código mal formado \""+ mensaje +"\"");
     }
-  }
-
-  // Imprime un mensaje de un usuario
-  private synchronized static void printMessage(String usuario, String date, String mensaje, String grupo) {
-    System.out.println("[" + date + "]" + (grupo == null ? "" : " (" + grupo + ")")
-                        + " " + usuario + ": " + mensaje);
   }
 
   public void run() {
@@ -78,7 +72,6 @@ class Escuchador extends Thread {
   }
 }
 
-
 /*
   Gestiona el envío de mensajes de un cliente en la parte del cliente.
 */
@@ -90,8 +83,6 @@ public class ClienteChat {
   private static PrintWriter outPrinter = null;
 
 	public static void main(String[] args) {
-  	SimpleDateFormat ft = new SimpleDateFormat ("hh:mm:ss");
-		String buferEnvio;
     Scanner scanner = new Scanner(System.in);
 
     System.out.print("Introduce la dirección del servidor: ");
@@ -107,11 +98,12 @@ public class ClienteChat {
     String nombre = scanner.nextLine();
 
 		try {
+		  // Envía el nombre
 		  socketServicio = new Socket(host,port);	
-
 			outPrinter = new PrintWriter(socketServicio.getOutputStream(),true);
-
       outPrinter.println("1000" + nombre);
+      
+      // Empieza a escuchar mensajes en paralelo
       esc = new Escuchador(new BufferedReader(new InputStreamReader(socketServicio.getInputStream())));
       esc.start();
 		} catch (UnknownHostException e) {
@@ -119,8 +111,12 @@ public class ClienteChat {
 		} catch (IOException e) {
 			System.err.println("Error de entrada/salida al abrir el socket.");
 		}
-
+		
+   	SimpleDateFormat ft = new SimpleDateFormat ("hh:mm:ss");
     String mensaje = "Esto es un mensaje de prueba";
+ 		String buferEnvio;
+ 		
+ 		// Envía mensajes hasta que haya uno vacío
     do {
       buferEnvio = "1001NombreDePrueba;" + ft.format(new Date()) + ";" + mensaje;
       outPrinter.println(buferEnvio);
