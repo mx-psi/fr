@@ -3,6 +3,9 @@ import java.util.IllegalFormatException;
 import java.util.HashMap;
 import java.net.ServerSocket;
 
+/*
+  Guarda la información de todos los clientes y grupos y escucha nuevas conexiones
+*/
 public class ServidorChat {
   private static int port = 8989; // Puerto por defecto, puede cambiarse en los parámetros
   private static ServerSocket socketServidor;
@@ -55,8 +58,8 @@ public class ServidorChat {
     return grupos.get(grupo).addMember(clientes.get(cliente));
   }
 
-  // Envía un mensaje al cliente con id "destino"
-  public static boolean sendMessageToClient(String codigo, String destino, String message) {
+  // Envía un mensaje al cliente con nombre "destino"
+  public static boolean sendToClient(String codigo, String destino, String message) {
     if (!clientes.containsKey(destino))
       return false;
 
@@ -64,8 +67,8 @@ public class ServidorChat {
     return true;
   }
   
-  // Envía un mensaje al grupo con id "id"
-  public static boolean sendMessageToGroup(String codigo, String nombregrupo, String message) {
+  // Envía un mensaje al grupo con nombre "nombregrupo"
+  public static boolean sendToGroup(String codigo, String nombregrupo, String message) {
     if (!grupos.containsKey(nombregrupo))
       return false;
 
@@ -77,8 +80,8 @@ public class ServidorChat {
     if (args.length >= 1)
       port = Integer.parseInt(args[0]);
 
-    clientes = new HashMap(2*maxExpectedClients, (float) 1/2);
-    grupos   = new HashMap(2*maxExpectedGroups , (float) 1/2);
+    clientes = new HashMap<String,Cliente>(2*maxExpectedClients, (float) 1/2);
+    grupos   = new HashMap<String,Grupo>(2*maxExpectedGroups , (float) 1/2);
     if (initializeServerSocket()) {
       System.out.println("Esperando conexiones a través del puerto " + port + "...");
       keepListening();

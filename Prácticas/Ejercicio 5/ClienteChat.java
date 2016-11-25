@@ -6,10 +6,19 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
+
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Scanner;
 
+import java.util.Scanner;
+import java.util.Date;
+
+import java.text.SimpleDateFormat;
+
+
+/*
+  Escucha e interpreta los mensajes enviados por el servidor
+*/
 class Escuchador extends Thread {
   private BufferedReader in = null;
 
@@ -69,6 +78,10 @@ class Escuchador extends Thread {
   }
 }
 
+
+/*
+  Gestiona el envío de mensajes de un cliente en la parte del cliente.
+*/
 public class ClienteChat {
   private static String host = "localhost";
   private static int port = 8989;
@@ -77,6 +90,7 @@ public class ClienteChat {
   private static PrintWriter outPrinter = null;
 
 	public static void main(String[] args) {
+  	SimpleDateFormat ft = new SimpleDateFormat ("hh:mm:ss");
 		String buferEnvio;
     Scanner scanner = new Scanner(System.in);
 
@@ -97,7 +111,7 @@ public class ClienteChat {
 
 			outPrinter = new PrintWriter(socketServicio.getOutputStream(),true);
 
-      outPrinter.println("1004" + nombre);
+      outPrinter.println("1000" + nombre);
       esc = new Escuchador(new BufferedReader(new InputStreamReader(socketServicio.getInputStream())));
       esc.start();
 		} catch (UnknownHostException e) {
@@ -108,7 +122,7 @@ public class ClienteChat {
 
     String mensaje = "Esto es un mensaje de prueba";
     do {
-      buferEnvio = "1001NombreDePrueba;11:22:33;" + mensaje;
+      buferEnvio = "1001NombreDePrueba;" + ft.format(new Date()) + ";" + mensaje;
       outPrinter.println(buferEnvio);
       mensaje = scanner.nextLine();
     } while (!mensaje.equals(""));

@@ -1,3 +1,7 @@
+
+/*
+  Excepción que ocurre cuando un nombre no cumple las condiciones
+*/
 public class IllegalNameException extends Exception {
   String nombre;
 

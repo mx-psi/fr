@@ -13,7 +13,7 @@ Nuestro protocolo de aplicación consiste en la implementación de un **servicio
 
 <!--TODO: Los usuarios se loguean en el servicio?-->
 
-Para dar soporte a este servicio el protocolo implementado consta de 4 tipos de mensajes: mensajes enviados de los usuarios al servidor, petición de creación de grupos, mensajes enviados del servidor a los usuarios y mensajes de error (cuando no existe un grupo o usuario o no ha sido posible el envío de un mensaje).
+Para dar soporte a este servicio el protocolo implementado consta de 5 tipos de mensajes: mensajes enviados de los usuarios al servidor, petición de creación de grupos y de reserva de nombres de usuario, mensajes enviados del servidor a los usuarios y mensajes de error (cuando no existe un grupo o usuario o no ha sido posible el envío de un mensaje).
 
 # Diagrama de estados del servidor
 
@@ -25,10 +25,10 @@ Para dar soporte a este servicio el protocolo implementado consta de 4 tipos de 
 
 | **Código** | **Cuerpo** | **Descripción**|
 |------------|------------|----------------|
+| 1000       | *username* | El cliente solicita que su nombre sea *username*. |
 | 1001       | *username* + ; + *time* + ; + *contenido* | Solicita el envío de *contenido* al **usuario** de nombre *username* |
 | 1002       | *groupname* + ; + *time* + ; + *contenido* | Solicita el envío de *contenido* al **grupo** de nombre *groupname* |
 | 1003       | *groupname* + ; + *username*| El cliente solicita que se añada *username* a *groupname*. Si el grupo no existe se creará. |
-| 1004       | *username* | El cliente solicita que su nombre sea *uesrname*. |
 | 1999       | *bye* | El cliente solicita su desconexión |
 
 ## Servidor
@@ -42,7 +42,7 @@ Para dar soporte a este servicio el protocolo implementado consta de 4 tipos de 
 | 2005 | *groupname* | *username* | El usuario *username* ya estaba en el grupo *groupname* |
 | 2006 | *groupname* | El grupo *groupname* está lleno |
 | 1004 | *username* + ; + *time* + ; + *mensaje* | El usuario *username* ha enviado en el tiempo *time* el mensaje *mensaje* |
-| 1005 | *groupname* + ; + *username* + ; + *time* + ; + *mensaje* | El usuario *username* ha enviado (en el grupo *groupname*) en el tiempo *time* el mensaje *mensaje* |
+| 1005 | *groupname* + ; + *username* + ; + *time* + ; + *mensaje* | El usuario *username* ha enviado en el grupo *groupname* en el tiempo *time* el mensaje *mensaje* |
 | 1998 | *username* | Indica a un cliente la desconexión de otro cliente *username* |
 
 

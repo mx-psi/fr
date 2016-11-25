@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 
+/*
+  Gestiona la información y envío de mensajes en un grupo
+*/
 public class Grupo {
   private String groupName;
   private ArrayList<Cliente> clientes;
@@ -7,7 +10,7 @@ public class Grupo {
 
 	public Grupo(String name, Cliente creador) {
     groupName = name;
-		clientes = new ArrayList();
+		clientes = new ArrayList<Cliente>();
     addMember(creador);
 	}
 
