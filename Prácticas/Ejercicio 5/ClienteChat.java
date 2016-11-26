@@ -78,11 +78,63 @@ public class ClienteChat {
   private static Socket socket = null;
   private static Escuchador esc = null;
   private static ObjectOutputStream outStream = null;
+  private static String nombre = null;
+
+  // Imprime un mensaje relacionado con el programa. No incluye salto de línea
+  private static void programMessage(String mensaje) {
+    System.out.print(mensaje);
+  }
+
+  // Imprime un mensaje de error
+  private static void error(String mensaje) {
+    System.err.println(mensaje);
+  }
+
+  private static boolean esComando(String mensaje) {
+    return mensaje.charAt(0) == '/';
+  }
+
+  private static boolean parseComando(String mensaje) {
+    // Obtiene comando y argumentos, si los hay
+    String comando = mensaje.substring(1);
+    String argumentos = "";
+    int separador = comando.indexOf(" ");
+    if (separador != -1) {
+      argumentos = comando.substring(separador+1);
+      comando = comando.substring(0, separador).toLowerCase();
+    }
+
+    // Interpreta el comando
+    switch(comando) {
+      case "close":
+      case "exit":
+      case "quit":
+      case "q":
+      case "salir":
+        programMessage("Cerrando la conexión con el servidor...\n");
+        return false;
+      case "conversacion":
+      case "c":
+        if (!Contactos.setConvActual(argumentos))
+          programMessage("Ya estás conversando " + (Contactos.convActualEsGrupo() ? "en" : "con")
+                            + " " + argumentos + ".\n");
+        else {
+          // TODO: ¿limpiar chat y mostrar mensajes de la nueva conversación?
+          // TODO: ¿debería fallar si el objetivo no está conectado?
+          programMessage("Ahora estás hablando con " + argumentos + ".\n");
+        }
+        return true;
+      // TODO: comandos para crear grupo, añadir a alguien a un grupo y tal vez ver quién hay en un grupo
+      default:
+        programMessage("Comando desconocido.\n");
+        return true;
+    }
+  }
 
 	public static void main(String[] args) {
     Scanner scanner = new Scanner(System.in);
 
-    System.out.print("Introduce la dirección del servidor: ");
+    programMessage("Introduce la dirección del servidor: ");
     String nl = scanner.nextLine();
     if (nl.contains(":")) {
       host = nl.split(":")[0];
@@ -91,8 +143,8 @@ public class ClienteChat {
     else if (!nl.isEmpty())
       host = nl;
 
-    System.out.print("Escoge un nombre de usuario: ");
-    String nombre = scanner.nextLine();
+    programMessage("Escoge un nombre de usuario: ");
+    nombre = scanner.nextLine();
     Contactos.setConvActual(nombre);
 
 		try {
@@ -105,43 +157,49 @@ public class ClienteChat {
       Mensaje login = (Mensaje) ois.readObject();
       if (login.getCodigo() != 1000 || !login.getContenido().equals(nombre)) {
         if (login.getCodigo() == 2007)
-          System.err.println("Error: el nombre " + login.getContenido() + " es inválido");
+          error("Error: el nombre " + login.getContenido() + " es inválido");
         else if (login.getCodigo() == 2008)
-          System.err.println("Error: el nombre " + login.getContenido() + " está siendo usado");
+          error("Error: el nombre " + login.getContenido() + " está siendo usado");
         else
-          System.err.println("Error desconocido");
+          error("Error desconocido");
         
         return;
       }
-      
-      
+
+      programMessage("¡Conectado con éxito!\n");
+      // TODO: si el servidor va a mandar más información, escucharla aquí
+
       // Empieza a escuchar mensajes en paralelo
       esc = new Escuchador(ois);
       esc.start();
 		} catch (UnknownHostException e) {
-			System.err.println("Error: Nombre de host no encontrado");
+			error("Error: Nombre de host no encontrado");
       return;
 		} catch (IOException e) {
-			System.err.println("Error de entrada/salida al abrir el socket");
+			error("Error de entrada/salida al abrir el socket");
       return;
 		} catch(ClassNotFoundException e){
-      System.err.println("Clase no encontrada");
+      error("Clase no encontrada");
     }
-		
-    String mensaje = "Esto es un mensaje de prueba";
+
+    String mensaje = scanner.nextLine();
     Mensaje aEnviar;
+    boolean cierre = false;   // true si se ha introducido un comando para cerrar el chat
  		
  		try{
- 		// Envía mensajes hasta que haya uno vacío
-    do {
-      aEnviar = new Mensaje(Contactos.getConvActual(),new Date(),mensaje);
-      outStream.writeObject(aEnviar);
-      mensaje = scanner.nextLine();
-    } while (mensaje != null);
+      do {
+        if (esComando(mensaje))
+          cierre = parseComando(mensaje);
+        else {
+          aEnviar = new Mensaje(Contactos.getConvActual(),new Date(),mensaje);
+          outStream.writeObject(aEnviar);
+        }
+        mensaje = scanner.nextLine();
+      } while (!cierre && mensaje != null);
 
-    outStream.writeObject(new Mensaje(1999,"bye"));
+      outStream.writeObject(new Mensaje(1999,"bye"));
     } catch (IOException e) {
-			System.err.println("Error de entrada/salida durante el envío.");
+			error("Error de entrada/salida durante el envío.");
 		}
 	}
 }

@@ -1,23 +1,22 @@
 import java.util.HashMap;
-import java.util.ArrayList;
 
 /*
   Lista de contactos y grupos con mensajes
 */
 public class Contactos {
-  private static HashMap<String,ArrayList<Mensaje>> mensajes = 
-  new HashMap<String,ArrayList<Mensaje>>();
+  private static HashMap<String,Conversacion> mensajes = new HashMap<String,Conversacion>();
   private static String convActual;
   
   // Añade un mensaje a la lista de un contacto
   public static void addMensaje(String conv, Mensaje mensaje){
     if (!mensajes.containsKey(conv))
-      mensajes.put(conv, new ArrayList<Mensaje>());
+      mensajes.put(conv, new Conversacion(mensaje.esDeGrupo()));
+
     mensajes.get(conv).add(mensaje);
   }
 
   // Obtiene los mensajes de un contacto
-  public static ArrayList<Mensaje> getMensajes(String conv){
+  public static Conversacion getMensajes(String conv){
     return mensajes.get(conv);
   }
 
@@ -25,8 +24,17 @@ public class Contactos {
     return convActual;
   }
 
-  public static void setConvActual(String conv){
+  public static boolean convActualEsGrupo() {
+    return mensajes.get(convActual).esGrupo();
+  }
+
+  // Devuelve 1 en caso de éxito, 0 si no ha cambiado la conversación
+  public static boolean setConvActual(String conv){
+    if (conv == convActual)
+      return false;
+
     convActual = conv;
+    return true;
   }
 }
 

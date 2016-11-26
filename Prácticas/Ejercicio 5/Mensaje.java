@@ -50,6 +50,10 @@ public class Mensaje implements java.io.Serializable {
     return contenido;
   }
   
+  public boolean esDeGrupo() {
+    return grupo != null;
+  }
+  
   public String getGrupo(){
     return grupo;
   }
