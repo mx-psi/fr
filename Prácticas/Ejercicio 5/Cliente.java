@@ -50,10 +50,11 @@ public class Cliente extends Thread {
 
   // Hebra que se encarga de recibir datos de este cliente
   public void run() {
-    if (!getLoginInfo()) return;
-
-    login();
-    listen();
+    if (getLoginInfo()) {
+      login();
+      listen();
+    }
+    disconnect();
   }
 
   // Recibe datos del cliente
@@ -95,8 +96,11 @@ public class Cliente extends Thread {
 		catch (ClassNotFoundException e) {
 			System.err.println("Error en la recepción del cliente (name = " + name + ")");
 		}
+  }
 
+  private void disconnect() {
 		System.out.println("El cliente " + name + " se ha desconectado");
+    ServidorChat.removeClient(name);
   }
   
   // Evalúa el mensaje y actúa. Devuelve false si se debe cerrar la conexión

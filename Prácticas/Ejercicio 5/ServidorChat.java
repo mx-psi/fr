@@ -51,6 +51,11 @@ public class ServidorChat {
     }
   }
 
+  // Elimina un cliente ya desconectado a partir de su nombre
+  public static void removeClient(String name) {
+    clientes.remove(name);
+  }
+
   // Añade un grupo y devuelve si ha sido posible
   public static boolean addGroup(String nombre, Cliente creador) {
     if (nombreUsado(nombre))
