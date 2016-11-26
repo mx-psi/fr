@@ -24,4 +24,9 @@ public class Conversacion {
 
     mensajes.add(m);
   }
+
+  public void mostrar() {
+    for (Mensaje m:mensajes)
+      System.out.println(m);
+  }
 }

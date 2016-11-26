@@ -20,6 +20,20 @@ public class Contactos {
     return mensajes.get(conv);
   }
 
+  // Obtiene los mensajes de la conversación actual
+  public static Conversacion getMensajes() {
+    return getMensajes(convActual);
+  }
+
+  public static void mostrarMensajes(String conv) {
+    if (getMensajes(conv) != null)
+      getMensajes(conv).mostrar();
+  }
+
+  public static void mostrarMensajes() {
+    mostrarMensajes(convActual);
+  }
+
   public static String getConvActual(){
     return convActual;
   }
