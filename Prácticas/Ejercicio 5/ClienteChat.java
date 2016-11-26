@@ -182,20 +182,22 @@ public class ClienteChat {
       error("Clase no encontrada");
     }
 
-    String mensaje = scanner.nextLine();
+    String mensaje;
     Mensaje aEnviar;
-    boolean cierre = false;   // true si se ha introducido un comando para cerrar el chat
+    boolean persiste = true;   // false si se ha introducido un comando para cerrar el chat o un mensaje nulo
  		
- 		try{
+ 		try {
       do {
-        if (esComando(mensaje))
-          cierre = parseComando(mensaje);
+        mensaje = scanner.nextLine();
+        if (mensaje == null)
+          persiste = false;
+        else if (esComando(mensaje))
+          persiste = parseComando(mensaje);
         else {
           aEnviar = new Mensaje(Contactos.getConvActual(),new Date(),mensaje);
           outStream.writeObject(aEnviar);
         }
-        mensaje = scanner.nextLine();
-      } while (!cierre && mensaje != null);
+      } while (persiste);
 
       outStream.writeObject(new Mensaje(1999,"bye"));
     } catch (IOException e) {
