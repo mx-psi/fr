@@ -1,11 +1,9 @@
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.BufferedReader;
-import java.io.PrintWriter;
+
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
 
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -13,68 +11,57 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 import java.util.Date;
 
-import java.text.SimpleDateFormat;
-
 
 /*
   Escucha e interpreta los mensajes enviados por el servidor
 */
 class Escuchador extends Thread {
-  private BufferedReader in = null;
+  private ObjectInputStream in = null;
 
-  public Escuchador(BufferedReader br) {
+  public Escuchador(ObjectInputStream br) {
     in = br;
   }
 
-  private void parse(String mensaje) {
-    try {
-      int codigo = Integer.parseInt(mensaje.substring(0,4), 10);
-      String[] datos = mensaje.substring(4).split(";");
-      Mensaje m = null;
+  private void parse(Mensaje m) {
+    String conv = m.getConversacion();
 
-      switch(codigo){
-        case 2001: 
-          System.err.println("Error: El usuario " + datos[0] + " no existe");
-          break;
-        case 2002: 
-          System.err.println("Error: El grupo " + datos[0] + " no existe");
-          break;
-        case 2004:
-          System.err.println("Error: El último mensaje estaba mal formado");
-          break;
-        case 1004:
-          m = new Mensaje(datos[0],datos[1],datos[2]);
-          Contactos.addMensaje(datos[0], m);
-          break;
-        case 1005:
-          m =  new Mensaje(datos[1],datos[2],datos[3],datos[0]);
-          Contactos.addMensaje(datos[1],m);
-          break;
-        default: 
-          System.err.println("Error: Tipo de mensaje no reconocido");
-          break;
-      }
-      
-      if(m != null && Contactos.getConvActual().equals(datos[0]))
-        System.out.println(m);
-        
-    } catch(java.lang.ArrayIndexOutOfBoundsException e){
-      System.err.println("Error: Mensaje mal formado \""+ mensaje +"\"");
+    switch(m.getCodigo()){
+      case 2001: 
+        System.err.println("Error: El usuario " + m.getContenido() + " no existe");
+        break;
+      case 2002: 
+        System.err.println("Error: El grupo " + m.getContenido() + " no existe");
+        break;
+      case 2004:
+        System.err.println("Error: El último mensaje estaba mal formado");
+        break;
+      case 1001:
+        Contactos.addMensaje(conv,m);
+        break;
+      case 1002:
+        Contactos.addMensaje(conv,m);
+        break;
+      default: 
+        System.err.println("Error: Tipo de mensaje no reconocido");
+        break;
     }
-    catch(NumberFormatException e){
-      System.err.println("Error: Código mal formado \""+ mensaje +"\"");
-    }
+    
+    if(m.getCodigo() < 2000 && Contactos.getConvActual().equals(conv))
+      System.out.println(m);
   }
 
   public void run() {
-    String line;
+    Mensaje m;
     try {
-      while((line = in.readLine()) != null) {
-        parse(line);
+      while((m = (Mensaje) in.readObject()) != null) {
+        parse(m);
       }
     }
     catch (IOException e) {
       System.err.println("Error de entrada/salida.");
+    }
+    catch(ClassNotFoundException e){
+      System.err.println("Clase no encontrada");
     }
   }
 }
@@ -85,9 +72,9 @@ class Escuchador extends Thread {
 public class ClienteChat {
   private static String host = "localhost";
   private static int port = 8989;
-  private static Socket socketServicio = null;
+  private static Socket socket = null;
   private static Escuchador esc = null;
-  private static PrintWriter outPrinter = null;
+  private static ObjectOutputStream outStream = null;
 
 	public static void main(String[] args) {
     Scanner scanner = new Scanner(System.in);
@@ -107,12 +94,12 @@ public class ClienteChat {
 
 		try {
 		  // Envía el nombre
-		  socketServicio = new Socket(host,port);	
-			outPrinter = new PrintWriter(socketServicio.getOutputStream(),true);
-      outPrinter.println("1000" + nombre);
+		  socket = new Socket(host,port);	
+			outStream = new ObjectOutputStream(socket.getOutputStream());
+      outStream.writeObject(new Mensaje(1000,nombre));
       
       // Empieza a escuchar mensajes en paralelo
-      esc = new Escuchador(new BufferedReader(new InputStreamReader(socketServicio.getInputStream())));
+      esc = new Escuchador(new ObjectInputStream(socket.getInputStream()));
       esc.start();
 		} catch (UnknownHostException e) {
 			System.err.println("Error: Nombre de host no encontrado.");
@@ -120,17 +107,20 @@ public class ClienteChat {
 			System.err.println("Error de entrada/salida al abrir el socket.");
 		}
 		
-   	SimpleDateFormat ft = new SimpleDateFormat ("hh:mm:ss");
     String mensaje = "Esto es un mensaje de prueba";
- 		String buferEnvio;
+    Mensaje aEnviar;
  		
+ 		try{
  		// Envía mensajes hasta que haya uno vacío
     do {
-      buferEnvio = "1001NombreDePrueba;" + ft.format(new Date()) + ";" + mensaje;
-      outPrinter.println(buferEnvio);
+      aEnviar = new Mensaje(Contactos.getConvActual(),new Date(),mensaje);
+      outStream.writeObject(aEnviar);
       mensaje = scanner.nextLine();
-    } while (!mensaje.equals(""));
+    } while (mensaje != null);
 
-    outPrinter.println("1999bye");
+    outStream.writeObject(new Mensaje(1999,"bye"));
+    } catch (IOException e) {
+			System.err.println("Error de entrada/salida durante el envío.");
+		}
 	}
 }

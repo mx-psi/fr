@@ -20,20 +20,20 @@ public class Grupo {
   }
   
   // Envía mensaje a todos los clientes del grupo
-  public void sendMessage(String mensaje) {
+  public void sendMessage(Mensaje mensaje) {
     for (Cliente c:clientes)
-      c.sendMessage("1005" + getName() + ";" + c.getClientName() + ";" + mensaje);
+      c.sendMessage(mensaje);
   }
 
   // Devuelve true en caso de éxito, false si ya estaba
   public boolean addMember(Cliente nuevo, Cliente solicitante) {
     if (clientes.size() == maxClientes) {
-      solicitante.sendMessage("2006" + getName());
+      solicitante.sendMessage(new Mensaje(2006,getName()));
       return false;
     }
 
     if (clientes.contains(nuevo)) {
-      solicitante.sendMessage("2005" + getName() + ";" + nuevo.getClientName());
+      solicitante.sendMessage(new Mensaje(2005, getName() + ";" + nuevo.getClientName()));
       return false;
     }
 

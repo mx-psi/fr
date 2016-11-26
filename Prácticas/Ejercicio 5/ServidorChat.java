@@ -7,7 +7,7 @@ import java.net.ServerSocket;
   Guarda la información de todos los clientes y grupos y escucha nuevas conexiones
 */
 public class ServidorChat {
-  private static int port = 8989; // Puerto por defecto, puede cambiarse en los parámetros
+  private static int port = 8989; // Puerto por defecto
   private static ServerSocket socketServidor;
   private static HashMap<String, Cliente> clientes;
   private static HashMap<String, Grupo> grupos;
@@ -43,6 +43,9 @@ public class ServidorChat {
     } catch(IllegalNameException e) {
       System.out.println("Error: solicitud de nombre inválida (mensaje = " + e.what() + ")");
     }
+    catch(ClassNotFoundException e) {
+      System.out.println("Error: no se pudo aceptar la conexión (nombre = " + nombre + ")");
+    }
   }
 
   // Añade un grupo
@@ -59,20 +62,20 @@ public class ServidorChat {
   }
 
   // Envía un mensaje al cliente con nombre "destino"
-  public static boolean sendToClient(String codigo, String destino, String message) {
+  public static boolean sendToClient(String destino, Mensaje message) {
     if (!clientes.containsKey(destino))
       return false;
 
-    clientes.get(destino).sendMessage(codigo + message);
+    clientes.get(destino).sendMessage(message);
     return true;
   }
   
   // Envía un mensaje al grupo con nombre "nombregrupo"
-  public static boolean sendToGroup(String codigo, String nombregrupo, String message) {
+  public static boolean sendToGroup(String nombregrupo, Mensaje message) {
     if (!grupos.containsKey(nombregrupo))
       return false;
 
-    grupos.get(nombregrupo).sendMessage(codigo + nombregrupo + ";" + message);
+    grupos.get(nombregrupo).sendMessage(message);
     return true;
   }
   

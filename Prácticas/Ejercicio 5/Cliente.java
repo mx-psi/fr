@@ -3,9 +3,8 @@ import java.util.IllegalFormatException;
 import java.net.Socket;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
-import java.io.PrintWriter;
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
 
 /*
   Guarda la información de cada cliente y gestiona la recepción de sus 
@@ -14,21 +13,20 @@ import java.io.PrintWriter;
 public class Cliente extends Thread {
   private final String name;
   private Socket socket = null;
-  private PrintWriter outPrinter;
- 	private BufferedReader inReader;
+  private ObjectOutputStream outStream;
+  private ObjectInputStream inStream;
 
-  public Cliente(Socket socket) throws IOException, IllegalNameException {
+  public Cliente(Socket socket) throws IOException, IllegalNameException, ClassNotFoundException {
     this.socket = socket;
-    outPrinter = new PrintWriter(socket.getOutputStream(), true);
-    inReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+    outStream = new ObjectOutputStream(socket.getOutputStream());
+    inStream = new ObjectInputStream(socket.getInputStream());
     
     // Obten el nombre del cliente
-    String primerMensaje = inReader.readLine();
-    String codigo = primerMensaje.substring(0,4);
-    if (codigo.equals("1000") && primerMensaje.length() <= 24)
-      name = primerMensaje.substring(4);
+    Mensaje primerMensaje = (Mensaje) inStream.readObject();
+    if (primerMensaje.getCodigo() == 1000 && primerMensaje.getContenido().length() <= 20)
+      name = primerMensaje.getContenido();
     else
-      throw new IllegalNameException(primerMensaje);
+      throw new IllegalNameException(primerMensaje.getContenido());
   }
   
   // Devuelve el nombre del cliente
@@ -60,24 +58,31 @@ public class Cliente extends Thread {
   }
   
   // Envía el mensaje mensaje al cliente
-  public void sendMessage(String mensaje){
+  public void sendMessage(Mensaje mensaje){
     System.out.println("Enviando mensaje al cliente " + name);
-   	outPrinter.println(mensaje);
+    try{
+   	outStream.writeObject(mensaje);
+   	}catch(IOException e){
+   	  System.err.println("Error en el envío al cliente " + name);
+   	}
   }
   
   // Escucha los mensajes
   private void listen() {
-    String mensaje = "";
+    Mensaje mensaje;
     
     try{
-      while(mensaje != null) {
-        mensaje = inReader.readLine();
-        System.out.println("Recibido: \"" + mensaje + "\" del cliente " + name);
+       do {
+        mensaje = (Mensaje) inStream.readObject();
+        System.out.println("Recibido: \"" + mensaje.getContenido() + "\" del cliente " + name);
         if (mensaje != null)
           if (!parse(mensaje))
             mensaje = null;
-      }
+      } while(mensaje != null);
    	} catch (IOException e) {
+			System.err.println("Error en la recepción del cliente (name = " + name + ")");
+		}
+		catch (ClassNotFoundException e) {
 			System.err.println("Error en la recepción del cliente (name = " + name + ")");
 		}
 
@@ -85,22 +90,21 @@ public class Cliente extends Thread {
   }
   
   // Evalúa el mensaje y actúa. Devuelve false si se debe cerrar la conexión
-  private boolean parse(String mensaje){
-    try{
-    int codigo = Integer.parseInt(mensaje.substring(0,4), 10);
-    String[] datos = mensaje.substring(4).split(";");
-    
-    switch(codigo){
-      case 1001: 
-        if(!ServidorChat.sendToClient("1004", datos[0], name + ";" + datos[1] + ";" + datos[2]))
-          ServidorChat.sendToClient("2001", name, datos[0]);
+  private boolean parse(Mensaje mensaje){
+    String destinatario = mensaje.getConversacion();
+    switch(mensaje.getCodigo()){
+      case 1001:
+        mensaje.setUsuario(name);
+        if(!ServidorChat.sendToClient(destinatario, mensaje))
+          ServidorChat.sendToClient(name, new Mensaje(2001,destinatario));
         break;
-      case 1002: 
-        if (!ServidorChat.sendToGroup("1005", datos[0], name + ";" + datos[1] + ";" + datos[2]))
-          ServidorChat.sendToClient("2002", name, datos[0]);
+      case 1002:
+        mensaje.setUsuario(name);
+        if (!ServidorChat.sendToGroup(destinatario, mensaje))
+          ServidorChat.sendToClient(name, new Mensaje(2002,destinatario));
         break;
       case 1003: 
-        ServidorChat.addClientToGroup(datos[0], datos[1], name);
+        ServidorChat.addClientToGroup(mensaje.getGrupo(), mensaje.getUsuario(), name);
         break;
       case 1999:
         // TODO: avisar a otros clientes de la desconexión
@@ -109,17 +113,9 @@ public class Cliente extends Thread {
         } catch (IOException e) {}
         return false;
       default: 
-        System.err.println("Error: Código no reconocido \""+ codigo +"\"");
-        ServidorChat.sendToClient("2004", name, "");
+        System.err.println("Error: Código no reconocido \""+ mensaje.getCodigo() +"\"");
+        ServidorChat.sendToClient(name, new Mensaje(2004,""));
         break;
-    }
-    } catch(java.lang.ArrayIndexOutOfBoundsException e){
-      System.err.println("Error: Mensaje mal formado \""+ mensaje +"\"");
-      ServidorChat.sendToClient("2004", name, "");
-    }
-    catch(NumberFormatException e){
-      System.err.println("Error: Código mal formado \""+ mensaje +"\"");
-      ServidorChat.sendToClient("2004", name, "");
     }
     return true;
   }

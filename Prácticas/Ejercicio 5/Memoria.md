@@ -41,8 +41,8 @@ Para dar soporte a este servicio el protocolo implementado consta de 5 tipos de 
 | 2004 | *ERROR* | El último mensaje enviado estaba mal formado |
 | 2005 | *groupname* | *username* | El usuario *username* ya estaba en el grupo *groupname* |
 | 2006 | *groupname* | El grupo *groupname* está lleno |
-| 1004 | *username* + ; + *time* + ; + *mensaje* | El usuario *username* ha enviado en el tiempo *time* el mensaje *mensaje* |
-| 1005 | *groupname* + ; + *username* + ; + *time* + ; + *mensaje* | El usuario *username* ha enviado en el grupo *groupname* en el tiempo *time* el mensaje *mensaje* |
+| 1001 | *username* + ; + *time* + ; + *mensaje* | El usuario *username* ha enviado en el tiempo *time* el mensaje *mensaje* |
+| 1002 | *groupname* + ; + *username* + ; + *time* + ; + *mensaje* | El usuario *username* ha enviado en el grupo *groupname* en el tiempo *time* el mensaje *mensaje* |
 | 1998 | *username* | Indica a un cliente la desconexión de otro cliente *username* |
 
 
