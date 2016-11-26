@@ -18,27 +18,36 @@ public class Cliente extends Thread {
 
   public Cliente(Socket socket) throws IOException, IllegalNameException, ClassNotFoundException {
     this.socket = socket;
-    outStream = new ObjectOutputStream(socket.getOutputStream());
     inStream = new ObjectInputStream(socket.getInputStream());
+    outStream = new ObjectOutputStream(socket.getOutputStream());
     
-    // Obten el nombre del cliente
+    // Obtiene el nombre del cliente
     Mensaje primerMensaje = (Mensaje) inStream.readObject();
-    if (primerMensaje.getCodigo() == 1000 && primerMensaje.getContenido().length() <= 20)
-      name = primerMensaje.getContenido();
-    else
-      throw new IllegalNameException(primerMensaje.getContenido());
+    String nombrePedido = primerMensaje.getContenido();
+    int error = 0;
+    boolean repetido = false;
+    if (primerMensaje.getCodigo() != 1000)
+      error = 1;
+    else if (nombrePedido.length() > 20 || nombrePedido.length() < 1
+              || (repetido = ServidorChat.nombreUsado(nombrePedido)))
+      error = 2;
+
+    if (error != 0) {
+      sendMessage(new Mensaje(repetido ? 2008 : 2007, nombrePedido));
+      socket.close();
+      if (error == 1)
+        throw new IllegalNameException();
+
+      throw new IllegalNameException(nombrePedido, repetido);
+    }
+    name = primerMensaje.getContenido();
   }
-  
+
   // Devuelve el nombre del cliente
   public String getClientName() {
     return name;
   }
-  
-  // Devuelve el socket asociado al cliente
-  public Socket getSocket() {
-    return socket;
-  }
-  
+
   // Hebra que se encarga de recibir datos de este cliente
   public void run() {
     if (!getLoginInfo()) return;
@@ -54,6 +63,7 @@ public class Cliente extends Thread {
 
   // Se llama tras un acceso correcto
   private void login() {
+    sendMessage(new Mensaje(1000, name));  // Confirma nombre de usuario
     // TODO. Podría mandar una lista de usuarios y/o avisar al resto de usuarios
   }
   
@@ -96,12 +106,12 @@ public class Cliente extends Thread {
       case 1001:
         mensaje.setUsuario(name);
         if(!ServidorChat.sendToClient(destinatario, mensaje))
-          ServidorChat.sendToClient(name, new Mensaje(2001,destinatario));
+          sendMessage(new Mensaje(2001,destinatario));
         break;
       case 1002:
         mensaje.setUsuario(name);
         if (!ServidorChat.sendToGroup(destinatario, mensaje))
-          ServidorChat.sendToClient(name, new Mensaje(2002,destinatario));
+          sendMessage(new Mensaje(2002,destinatario));
         break;
       case 1003: 
         ServidorChat.addClientToGroup(mensaje.getGrupo(), mensaje.getUsuario(), name);
@@ -114,7 +124,7 @@ public class Cliente extends Thread {
         return false;
       default: 
         System.err.println("Error: Código no reconocido \""+ mensaje.getCodigo() +"\"");
-        ServidorChat.sendToClient(name, new Mensaje(2004,""));
+        sendMessage(new Mensaje(2004,""));
         break;
     }
     return true;

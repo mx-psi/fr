@@ -24,6 +24,7 @@ class Escuchador extends Thread {
 
   private void parse(Mensaje m) {
     String conv = m.getConversacion();
+    boolean esMensaje = false;
 
     switch(m.getCodigo()){
       case 2001: 
@@ -36,9 +37,11 @@ class Escuchador extends Thread {
         System.err.println("Error: El último mensaje estaba mal formado");
         break;
       case 1001:
+        esMensaje = true;
         Contactos.addMensaje(conv,m);
         break;
       case 1002:
+        esMensaje = true;
         Contactos.addMensaje(conv,m);
         break;
       default: 
@@ -46,7 +49,7 @@ class Escuchador extends Thread {
         break;
     }
     
-    if(m.getCodigo() < 2000 && Contactos.getConvActual().equals(conv))
+    if(esMensaje && Contactos.getConvActual().equals(conv))
       System.out.println(m);
   }
 
@@ -97,15 +100,33 @@ public class ClienteChat {
 		  socket = new Socket(host,port);	
 			outStream = new ObjectOutputStream(socket.getOutputStream());
       outStream.writeObject(new Mensaje(1000,nombre));
+
+      ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+      Mensaje login = (Mensaje) ois.readObject();
+      if (login.getCodigo() != 1000 || !login.getContenido().equals(nombre)) {
+        if (login.getCodigo() == 2007)
+          System.err.println("Error: el nombre " + login.getContenido() + " es inválido");
+        else if (login.getCodigo() == 2008)
+          System.err.println("Error: el nombre " + login.getContenido() + " está siendo usado");
+        else
+          System.err.println("Error desconocido");
+        
+        return;
+      }
+      
       
       // Empieza a escuchar mensajes en paralelo
-      esc = new Escuchador(new ObjectInputStream(socket.getInputStream()));
+      esc = new Escuchador(ois);
       esc.start();
 		} catch (UnknownHostException e) {
-			System.err.println("Error: Nombre de host no encontrado.");
+			System.err.println("Error: Nombre de host no encontrado");
+      return;
 		} catch (IOException e) {
-			System.err.println("Error de entrada/salida al abrir el socket.");
-		}
+			System.err.println("Error de entrada/salida al abrir el socket");
+      return;
+		} catch(ClassNotFoundException e){
+      System.err.println("Clase no encontrada");
+    }
 		
     String mensaje = "Esto es un mensaje de prueba";
     Mensaje aEnviar;

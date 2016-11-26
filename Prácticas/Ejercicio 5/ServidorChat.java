@@ -30,6 +30,10 @@ public class ServidorChat {
       addClient();
   }
 
+  public static boolean nombreUsado(String nombre) {
+    return clientes.containsKey(nombre) || grupos.containsKey(nombre);
+  }
+
   // Añade un cliente
   private static void addClient() {
     String nombre = "[no se llegó a leer el nombre]";
@@ -41,16 +45,19 @@ public class ServidorChat {
     } catch(IOException e) {
       System.out.println("Error: no se pudo aceptar la conexión solicitada (nombre = " + nombre + ")");
     } catch(IllegalNameException e) {
-      System.out.println("Error: solicitud de nombre inválida (mensaje = " + e.what() + ")");
-    }
-    catch(ClassNotFoundException e) {
+      System.out.println("Error: solicitud de nombre inválida (" + e.what() + ")");
+    } catch(ClassNotFoundException e) {
       System.out.println("Error: no se pudo aceptar la conexión (nombre = " + nombre + ")");
     }
   }
 
-  // Añade un grupo
-  public static void addGroup(String nombre, Cliente creador) {
+  // Añade un grupo y devuelve si ha sido posible
+  public static boolean addGroup(String nombre, Cliente creador) {
+    if (nombreUsado(nombre))
+      return false;
+
     grupos.put(nombre, new Grupo(nombre, creador));
+    return true;
   }
 
   // Añade un cliente a un grupo

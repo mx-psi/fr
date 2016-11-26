@@ -1,13 +1,13 @@
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
-public class Mensaje implements java.io.Serializable{
+public class Mensaje implements java.io.Serializable {
   private int codigo;
   private Date date;
   private String usuario;
   private String grupo;
   private String contenido;
-  private static SimpleDateFormat ft = new SimpleDateFormat ("HH:mm:ss");
+  private static SimpleDateFormat ft = new SimpleDateFormat("HH:mm:ss");
   
   // Constructor de mensajes no usuales
   public Mensaje(int codigo, String contenido){
@@ -61,7 +61,7 @@ public class Mensaje implements java.io.Serializable{
   public String getConversacion(){
     if(grupo != null)
       return grupo;
-    else
-      return usuario;
+
+    return usuario;
   }
 }
