@@ -28,9 +28,9 @@ public class Mensaje{
     this.grupo = grupo;
   }
   
-  // Imprime el mensaje
-  public void print(){
-    System.out.println("[" + date + "]" + (grupo == null ? "" : " (" + grupo + ")")
-                        + " " + usuario + ": " + contenido);
+  // Pasa a String
+  public String toString(){
+    return "[" + date + "]" + (grupo == null ? "" : " (" + grupo + ")")
+                        + " " + usuario + ": " + contenido;
   }
 }

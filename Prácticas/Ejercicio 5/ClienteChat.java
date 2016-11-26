@@ -30,6 +30,7 @@ class Escuchador extends Thread {
     try {
       int codigo = Integer.parseInt(mensaje.substring(0,4), 10);
       String[] datos = mensaje.substring(4).split(";");
+      Mensaje m = null;
 
       switch(codigo){
         case 2001: 
@@ -42,15 +43,21 @@ class Escuchador extends Thread {
           System.err.println("Error: El último mensaje estaba mal formado");
           break;
         case 1004:
-          Contactos.addMensaje(datos[0], new Mensaje(datos[0],datos[1],datos[2]));
+          m = new Mensaje(datos[0],datos[1],datos[2]);
+          Contactos.addMensaje(datos[0], m);
           break;
         case 1005:
-          Contactos.addMensaje(datos[1], new Mensaje(datos[1],datos[2],datos[3],datos[0]));
+          m =  new Mensaje(datos[1],datos[2],datos[3],datos[0]);
+          Contactos.addMensaje(datos[1],m);
           break;
         default: 
           System.err.println("Error: Tipo de mensaje no reconocido");
           break;
       }
+      
+      if(m != null && Contactos.getConvActual().equals(datos[0]))
+        System.out.println(m);
+        
     } catch(java.lang.ArrayIndexOutOfBoundsException e){
       System.err.println("Error: Mensaje mal formado \""+ mensaje +"\"");
     }
@@ -96,6 +103,7 @@ public class ClienteChat {
 
     System.out.print("Escoge un nombre de usuario: ");
     String nombre = scanner.nextLine();
+    Contactos.setConvActual(nombre);
 
 		try {
 		  // Envía el nombre
