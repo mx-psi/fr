@@ -44,6 +44,9 @@ class Escuchador extends Thread {
         esMensaje = true;
         Contactos.addMensaje(conv,m);
         break;
+       case 1004;
+        esMensaje = true;
+        leerFichero(m);
       default: 
         System.err.println("Error: Tipo de mensaje no reconocido");
         break;
@@ -51,6 +54,10 @@ class Escuchador extends Thread {
     
     if(esMensaje && Contactos.getConvActual().equals(conv))
       System.out.println(m);
+  }
+  
+  private void leerFichero(Mensaje m){
+    // TODO
   }
 
   public void run() {
@@ -93,6 +100,16 @@ public class ClienteChat {
   private static boolean esComando(String mensaje) {
     return mensaje.charAt(0) == '/';
   }
+  
+  private static enviaFichero(String ruta){
+    File file = new File(ruta);
+    byte [] rawFichero  = new byte [(int)file.length()];
+    fis = new FileInputStream(file);
+    bis = new BufferedInputStream(fis);
+    bis.read(rawFichero,0,rawFichero.length);
+    // TODO: Comprobar si es grupo
+    outStream.writeObject(new Mensaje(Contactos.getConvActual(),rawFichero,file.getName()));
+  }
 
   private static boolean parseComando(String mensaje) {
     // Obtiene comando y argumentos, si los hay
@@ -125,6 +142,11 @@ public class ClienteChat {
         }
         return true;
       // TODO: comandos para crear grupo, añadir a alguien a un grupo y tal vez ver quién hay en un grupo
+      case "s":
+      case "send":
+      case "envia":
+         enviaFichero(ruta);
+         return true;
       default:
         programMessage("Comando desconocido.\n");
         return true;
@@ -184,7 +206,7 @@ public class ClienteChat {
 
     String mensaje;
     Mensaje aEnviar;
-    boolean persiste = true;   // false si se ha introducido un comando para cerrar el chat o un mensaje nulo
+    boolean persiste = true; // false si se cierra el chat
  		
  		try {
       do {
@@ -194,7 +216,7 @@ public class ClienteChat {
         else if (esComando(mensaje))
           persiste = parseComando(mensaje);
         else {
-          aEnviar = new Mensaje(Contactos.getConvActual(),new Date(),mensaje);
+          aEnviar = new Mensaje(Contactos.getConvActual(),mensaje);
           outStream.writeObject(aEnviar);
         }
       } while (persiste);
