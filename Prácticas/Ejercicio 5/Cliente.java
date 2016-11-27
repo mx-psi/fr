@@ -108,6 +108,7 @@ public class Cliente extends Thread {
     String destinatario = mensaje.getConversacion();
     switch(mensaje.getCodigo()){
       case 1001:
+      case 1004:
         mensaje.setUsuario(name);
         if(!ServidorChat.sendToClient(destinatario, mensaje))
           sendMessage(new Mensaje(2001,destinatario));

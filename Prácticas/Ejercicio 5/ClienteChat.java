@@ -11,6 +11,13 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 import java.util.Date;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+
 
 /*
   Escucha e interpreta los mensajes enviados por el servidor
@@ -44,9 +51,10 @@ class Escuchador extends Thread {
         esMensaje = true;
         Contactos.addMensaje(conv,m);
         break;
-       case 1004;
+       case 1004:
         esMensaje = true;
         leerFichero(m);
+        break;
       default: 
         System.err.println("Error: Tipo de mensaje no reconocido");
         break;
@@ -57,7 +65,19 @@ class Escuchador extends Thread {
   }
   
   private void leerFichero(Mensaje m){
-    // TODO
+    try{
+      FileOutputStream fos = new FileOutputStream("./" + m.getRuta());
+      BufferedOutputStream bos = new BufferedOutputStream(fos);
+      byte[] contenido = m.getRawContenido();
+      bos.write(contenido, 0 , contenido.length);
+      bos.flush();
+    } 
+    catch (FileNotFoundException e){
+      System.err.println("Fichero no encontrado en la recepción" + m.getRuta());
+    }
+    catch (IOException e){
+      System.err.println("Error al intentar recibir el fichero " + m.getRuta());
+    }
   }
 
   public void run() {
@@ -101,14 +121,22 @@ public class ClienteChat {
     return mensaje.charAt(0) == '/';
   }
   
-  private static enviaFichero(String ruta){
+  private static void enviaFichero(String ruta){
+    try{
     File file = new File(ruta);
     byte [] rawFichero  = new byte [(int)file.length()];
-    fis = new FileInputStream(file);
-    bis = new BufferedInputStream(fis);
+    FileInputStream fis = new FileInputStream(file);
+    BufferedInputStream bis = new BufferedInputStream(fis);
     bis.read(rawFichero,0,rawFichero.length);
     // TODO: Comprobar si es grupo
     outStream.writeObject(new Mensaje(Contactos.getConvActual(),rawFichero,file.getName()));
+    }
+    catch (FileNotFoundException e){
+      System.err.println("Fichero no encontrado: " + ruta);
+    }
+    catch (IOException e){
+      System.err.println("Error al intentar recibir el fichero " + ruta);
+    }
   }
 
   private static boolean parseComando(String mensaje) {
@@ -145,7 +173,7 @@ public class ClienteChat {
       case "s":
       case "send":
       case "envia":
-         enviaFichero(ruta);
+         enviaFichero(argumentos);
          return true;
       default:
         programMessage("Comando desconocido.\n");

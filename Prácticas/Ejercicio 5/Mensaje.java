@@ -14,6 +14,7 @@ public class Mensaje implements java.io.Serializable {
   public Mensaje(int codigo, String contenido){
     this.codigo    = codigo;
     this.contenido = contenido.getBytes();
+    this.ruta = "/string";
   }
   
   // Constructor de mensajes a un solo contacto
@@ -49,7 +50,7 @@ public class Mensaje implements java.io.Serializable {
   // Pasa a String
   public String toString(){
     return "[" + ft.format(date) + "]" + (grupo == null ? "" : " (" + grupo + ")")
-                        + " " + usuario + (ruta.equals("/string")? ": " + getContenido() : " te ha enviado el fichero" + ruta + );
+                        + " " + usuario + (ruta.equals("/string")? ": " + getContenido() : " te ha enviado el fichero" + ruta);
   }
     
   // Establece el usuario
@@ -64,7 +65,18 @@ public class Mensaje implements java.io.Serializable {
   
   // Obtiene el contenido en forma de string
   public String getContenido(){
-    return new String(contenido,0,contenido.length);
+    if(ruta.equals("/string"))
+      return new String(contenido,0,contenido.length);
+    else
+      return "*Fichero: " + ruta + "*";
+  }
+  
+  public byte[] getRawContenido(){
+    return contenido;
+  }
+  
+  public String getRuta(){
+    return ruta;
   }
   
   // Indica si es un mensaje dirigido a un grupo
