@@ -6,10 +6,24 @@ import java.util.HashMap;
 public class Contactos {
   private static HashMap<String,Conversacion> mensajes = new HashMap<String,Conversacion>();
   private static String convActual;
-  
+
+  // Determina si se ha recibido un mensaje de una conversación o se ha abierto
+  public static boolean hayConversacionCon(String conv) {
+    return mensajes.containsKey(conv);
+  }
+
+  // Marca una conversación como iniciada. Devuelve false si ya estaba iniciada
+  public static boolean iniciaConversacionCon(String conv, boolean es_grupo) {
+    if (!hayConversacionCon(conv)) {
+      mensajes.put(conv, new Conversacion(es_grupo));
+      return true;
+    }
+    return false;
+  }
+
   // Añade un mensaje a la lista de un contacto
-  public static void addMensaje(String conv, Mensaje mensaje){
-    if (!mensajes.containsKey(conv))
+  public synchronized static void addMensaje(String conv, Mensaje mensaje){
+    if (!hayConversacionCon(conv))
       mensajes.put(conv, new Conversacion(mensaje.esDeGrupo()));
 
     mensajes.get(conv).add(mensaje);

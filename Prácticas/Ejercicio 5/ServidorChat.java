@@ -81,6 +81,12 @@ public class ServidorChat {
     clientes.get(destino).sendMessage(message);
     return true;
   }
+
+  // Envía un mensaje a todos los usuarios conectados
+  public static void sendToAllClients(Mensaje message) {
+    for (Cliente c:clientes.values())
+      c.sendMessage(message);
+  }
   
   // Envía un mensaje al grupo con nombre "nombregrupo"
   public static boolean sendToGroup(String nombregrupo, Mensaje message) {

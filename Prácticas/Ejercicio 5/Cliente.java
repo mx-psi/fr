@@ -82,8 +82,8 @@ public class Cliente extends Thread {
   private void listen() {
     Mensaje mensaje;
     
-    try{
-       do {
+    try {
+      do {
         mensaje = (Mensaje) inStream.readObject();
         System.out.println("Recibido: \"" + mensaje.getContenido() + "\" del cliente " + name);
         if (mensaje != null)
@@ -92,8 +92,7 @@ public class Cliente extends Thread {
       } while(mensaje != null);
    	} catch (IOException e) {
 			System.err.println("Error en la recepción del cliente (name = " + name + ")");
-		}
-		catch (ClassNotFoundException e) {
+		} catch (ClassNotFoundException e) {
 			System.err.println("Error en la recepción del cliente (name = " + name + ")");
 		}
   }
@@ -101,6 +100,9 @@ public class Cliente extends Thread {
   private void disconnect() {
 		System.out.println("El cliente " + name + " se ha desconectado");
     ServidorChat.removeClient(name);
+    Mensaje m = new Mensaje(1998, "");
+    m.setUsuario(name);
+    ServidorChat.sendToAllClients(m);
   }
   
   // Evalúa el mensaje y actúa. Devuelve false si se debe cerrar la conexión

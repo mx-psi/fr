@@ -44,16 +44,22 @@ class Escuchador extends Thread {
         System.err.println("Error: El último mensaje estaba mal formado");
         break;
       case 1001:
-        esMensaje = true;
-        Contactos.addMensaje(conv,m);
-        break;
       case 1002:
         esMensaje = true;
         Contactos.addMensaje(conv,m);
         break;
-       case 1004:
+      case 1004:
         esMensaje = true;
         leerFichero(m);
+        break;
+      case 1998:
+        esMensaje = !Contactos.convActualEsGrupo() /* || TODO: método que dé si el usuario estaba en el grupo */;
+        String nombre = m.getUsuario();
+        m = new Mensaje(0, nombre + " se ha desconectado."); // Mensaje que se mostrará al cliente
+        if (Contactos.hayConversacionCon(nombre))
+          Contactos.addMensaje(conv, m);
+        // TODO: almacenar m en todos los grupos en común con el usuario
+        // TODO: quitar usuario de la lista de conectados y de los grupos en los que estuviese
         break;
       default: 
         System.err.println("Error: Tipo de mensaje no reconocido");
@@ -63,17 +69,17 @@ class Escuchador extends Thread {
     if(esMensaje && Contactos.getConvActual().equals(conv))
       System.out.println(m);
   }
-  
-  private void leerFichero(Mensaje m){
-    try{
-      FileOutputStream fos = new FileOutputStream("./" + m.getRuta());
+
+  private void leerFichero(Mensaje m) {
+    try {
+      FileOutputStream fos = new FileOutputStream("./Recibidos/" + m.getRuta());
       BufferedOutputStream bos = new BufferedOutputStream(fos);
       byte[] contenido = m.getRawContenido();
-      bos.write(contenido, 0 , contenido.length);
+      bos.write(contenido, 0, contenido.length);
       bos.flush();
     } 
     catch (FileNotFoundException e){
-      System.err.println("Fichero no encontrado en la recepción" + m.getRuta());
+      System.err.println("Fichero no encontrado en la recepción " + m.getRuta());
     }
     catch (IOException e){
       System.err.println("Error al intentar recibir el fichero " + m.getRuta());
@@ -106,6 +112,13 @@ public class ClienteChat {
   private static Escuchador esc = null;
   private static ObjectOutputStream outStream = null;
   private static String nombre = null;
+  private static Scanner scanner = new Scanner(System.in);
+
+  // Pregunta algo al cliente, que responde desde teclado
+  public static String ask(String texto) {
+    programMessage(texto + ": ");
+    return scanner.nextLine();
+  }
 
   // Imprime un mensaje relacionado con el programa. No incluye salto de línea
   private static void programMessage(String mensaje) {
@@ -120,22 +133,22 @@ public class ClienteChat {
   private static boolean esComando(String mensaje) {
     return mensaje.charAt(0) == '/';
   }
-  
-  private static void enviaFichero(String ruta){
-    try{
-    File file = new File(ruta);
-    byte [] rawFichero  = new byte [(int)file.length()];
-    FileInputStream fis = new FileInputStream(file);
-    BufferedInputStream bis = new BufferedInputStream(fis);
-    bis.read(rawFichero,0,rawFichero.length);
-    // TODO: Comprobar si es grupo
-    outStream.writeObject(new Mensaje(Contactos.getConvActual(),rawFichero,file.getName()));
+
+  private static void enviaFichero(String ruta) {
+    try {
+      File file = new File(ruta);
+      byte [] rawFichero = new byte [(int)file.length()];
+      FileInputStream fis = new FileInputStream(file);
+      BufferedInputStream bis = new BufferedInputStream(fis);
+      bis.read(rawFichero,0,rawFichero.length);
+      // TODO: Comprobar si es grupo
+      outStream.writeObject(new Mensaje(Contactos.getConvActual(),rawFichero,file.getName()));
     }
-    catch (FileNotFoundException e){
-      System.err.println("Fichero no encontrado: " + ruta);
+    catch (FileNotFoundException e) {
+      error("Fichero no encontrado: " + ruta);
     }
-    catch (IOException e){
-      System.err.println("Error al intentar recibir el fichero " + ruta);
+    catch (IOException e) {
+      error("Error al intentar mandar el fichero " + ruta);
     }
   }
 
@@ -166,7 +179,9 @@ public class ClienteChat {
         else {
           // TODO: ¿debería fallar si el objetivo no está conectado?
           // TODO: clear?
-          programMessage("\nAhora estás hablando con " + argumentos + ".\n");
+          boolean es_grupo = false; // TODO
+          programMessage("\nAhora estás hablando " + (es_grupo ? "en" : "con") + " " + argumentos + ".\n");
+          Contactos.iniciaConversacionCon(argumentos, es_grupo);
           Contactos.mostrarMensajes();
         }
         return true;
@@ -174,8 +189,8 @@ public class ClienteChat {
       case "s":
       case "send":
       case "envia":
-         enviaFichero(argumentos);
-         return true;
+        enviaFichero(argumentos);
+        return true;
       default:
         programMessage("Comando desconocido.\n");
         return true;
@@ -183,10 +198,7 @@ public class ClienteChat {
   }
 
 	public static void main(String[] args) {
-    Scanner scanner = new Scanner(System.in);
-
-    programMessage("Introduce la dirección del servidor: ");
-    String nl = scanner.nextLine();
+    String nl = ask("Introduce la dirección del servidor");
     if (nl.contains(":")) {
       host = nl.split(":")[0];
       port = Integer.parseInt(nl.split(":")[1]);
@@ -194,8 +206,7 @@ public class ClienteChat {
     else if (!nl.isEmpty())
       host = nl;
 
-    programMessage("Escoge un nombre de usuario: ");
-    nombre = scanner.nextLine();
+    nombre = ask("Escoge un nombre de usuario");
     Contactos.setConvActual(nombre);
 
 		try {
@@ -244,7 +255,7 @@ public class ClienteChat {
           if (esComando(mensaje))
             persiste = parseComando(mensaje);
           else {
-            aEnviar = new Mensaje(Contactos.getConvActual(),mensaje);
+            aEnviar = new Mensaje(Contactos.getConvActual(), mensaje);
             outStream.writeObject(aEnviar);
           }
         }
