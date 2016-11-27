@@ -15,7 +15,7 @@ public class Mensaje implements java.io.Serializable {
   // Constructor de mensajes informativos
   public Mensaje(int codigo, String contenido){
     this.codigo    = codigo;
-    this.contenido = contenido.getBytes();
+    this.contenido = contenido.getBytes(StandardCharsets.UTF_8);
     this.ruta = "/string";
     esDeChat = false;
   }
@@ -26,7 +26,7 @@ public class Mensaje implements java.io.Serializable {
     this.usuario = usuario;
     this.date = new Date();
     this.ruta = "/string";
-    this.contenido = contenido.getBytes();
+    this.contenido = contenido.getBytes(StandardCharsets.UTF_8);
     esDeChat = true;
   }
     
@@ -36,7 +36,7 @@ public class Mensaje implements java.io.Serializable {
     this.usuario = usuario;
     this.date = new Date();
     this.ruta = "/string";
-    this.contenido = contenido.getBytes();
+    this.contenido = contenido.getBytes(StandardCharsets.UTF_8);
     this.grupo = grupo;
     esDeChat = true;
   }
