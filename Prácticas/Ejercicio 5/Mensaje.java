@@ -56,9 +56,9 @@ public class Mensaje implements java.io.Serializable {
   public String toString() {
     return (date == null ? "" : "[" + ft.format(date) + "] ")
          + (grupo == null ? "" : "(" + grupo + ") ")
-         + (esDeChat ? " " + usuario + ": " : "")
+         + (esDeChat ? usuario + ": " : "")
          + (ruta.equals("/string") ? getContenido()
-                : " " + usuario + " te ha mandado el fichero " + ruta);
+                : usuario + " te ha mandado el fichero " + ruta);
   }
 
   // Establece el usuario
