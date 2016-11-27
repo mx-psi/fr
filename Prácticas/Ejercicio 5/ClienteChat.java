@@ -88,7 +88,7 @@ class Escuchador extends Thread {
       }
     }
     catch (IOException e) {
-      System.err.println("Error de entrada/salida.");
+      System.err.println("Error de entrada.");
     }
     catch(ClassNotFoundException e){
       System.err.println("Clase no encontrada");
@@ -164,9 +164,10 @@ public class ClienteChat {
           programMessage("Ya estás conversando " + (Contactos.convActualEsGrupo() ? "en" : "con")
                             + " " + argumentos + ".\n");
         else {
-          // TODO: ¿limpiar chat y mostrar mensajes de la nueva conversación?
           // TODO: ¿debería fallar si el objetivo no está conectado?
-          programMessage("Ahora estás hablando con " + argumentos + ".\n");
+          // TODO: clear?
+          programMessage("\nAhora estás hablando con " + argumentos + ".\n");
+          Contactos.mostrarMensajes();
         }
         return true;
       // TODO: comandos para crear grupo, añadir a alguien a un grupo y tal vez ver quién hay en un grupo
@@ -234,24 +235,24 @@ public class ClienteChat {
 
     String mensaje;
     Mensaje aEnviar;
-    boolean persiste = true; // false si se cierra el chat
+    boolean persiste = true;   // false si se ha introducido un comando para cerrar el chat
  		
  		try {
       do {
-        mensaje = scanner.nextLine();
-        if (mensaje == null)
-          persiste = false;
-        else if (esComando(mensaje))
-          persiste = parseComando(mensaje);
-        else {
-          aEnviar = new Mensaje(Contactos.getConvActual(),mensaje);
-          outStream.writeObject(aEnviar);
+        mensaje = scanner.nextLine().trim();
+        if (mensaje != null && !mensaje.equals("")) {
+          if (esComando(mensaje))
+            persiste = parseComando(mensaje);
+          else {
+            aEnviar = new Mensaje(Contactos.getConvActual(),mensaje);
+            outStream.writeObject(aEnviar);
+          }
         }
       } while (persiste);
 
       outStream.writeObject(new Mensaje(1999,"bye"));
     } catch (IOException e) {
-			error("Error de entrada/salida durante el envío.");
+			error("Error durante el envío");
 		}
 	}
 }
