@@ -46,6 +46,8 @@ Para dar soporte a este servicio el protocolo implementado consta de 5 tipos de 
 | 1000 | *username* | Petición de nombre de usuario aceptada |
 | 1001 | *username* + ; + *time* + ; + *mensaje* | El usuario *username* ha enviado en el tiempo *time* el mensaje *mensaje* |
 | 1002 | *groupname* + ; + *username* + ; + *time* + ; + *mensaje* | El usuario *username* ha enviado en el grupo *groupname* en el tiempo *time* el mensaje *mensaje* |
+| 1996 | *username* + ; + *groupname* | Indica la entrada de *username* al grupo *groupname* |
+| 1997 | *username* | Indica a un cliente la conexión de otro cliente *username* |
 | 1998 | *username* | Indica a un cliente la desconexión de otro cliente *username* |
 
 

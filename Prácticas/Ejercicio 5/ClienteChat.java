@@ -52,14 +52,26 @@ class Escuchador extends Thread {
         esMensaje = true;
         leerFichero(m);
         break;
-      case 1998:
-        esMensaje = !Contactos.convActualEsGrupo() /* || TODO: método que dé si el usuario estaba en el grupo */;
+      case 1996:
         String nombre = m.getUsuario();
-        m = new Mensaje(0, nombre + " se ha desconectado."); // Mensaje que se mostrará al cliente
+        String nGrupo = m.getGrupo();
+        esMensaje = true;
+        m = new Mensaje(0, nombre + " se ha incorporado al grupo");
+        if (Contactos.hayConversacionCon(nGrupo))
+          Contactos.addMensaje(nGrupo, m);
+        // TODO: añadir al usuario a la lista de miembros de nGrupo
+        break;
+      case 1997:
+      case 1998:
+        String nombre = m.getUsuario();
+        esMensaje = !Contactos.convActualEsGrupo() /* || TODO: método que dé si el usuario estaba en el grupo */;
+        boolean conectado = m.getCodigo() == 1997;
+        m = new Mensaje(0, nombre + " se ha " + (conectado ? "" : "des") + "conectado."); // Mensaje que se mostrará al cliente
         if (Contactos.hayConversacionCon(nombre))
           Contactos.addMensaje(conv, m);
         // TODO: almacenar m en todos los grupos en común con el usuario
-        // TODO: quitar usuario de la lista de conectados y de los grupos en los que estuviese
+        // TODO: si 1997, añadir al usuario a la lista de conectados
+        // TODO: si 1998, quitar usuario de la lista de conectados y de los grupos en los que estuviese
         break;
       default: 
         System.err.println("Error: Tipo de mensaje no reconocido");
