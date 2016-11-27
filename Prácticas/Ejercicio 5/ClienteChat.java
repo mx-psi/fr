@@ -29,6 +29,10 @@ class Escuchador extends Thread {
     in = br;
   }
 
+  private boolean Soy(String n) {
+    return ClienteChat.getNombre().equals(n);
+  }
+
   private void parse(Mensaje m) {
     String conv = m.getConversacion();
     boolean esMensaje = false;
@@ -55,15 +59,21 @@ class Escuchador extends Thread {
       case 1996:
         String nombre = m.getUsuario();
         String nGrupo = m.getGrupo();
-        esMensaje = true;
-        m = new Mensaje(0, nombre + " se ha incorporado al grupo");
-        if (Contactos.hayConversacionCon(nGrupo))
-          Contactos.addMensaje(nGrupo, m);
-        // TODO: añadir al usuario a la lista de miembros de nGrupo
+        esMensaje = !Soy(nombre);
+        if (esMensaje) {
+          m = new Mensaje(0, nombre + " se ha incorporado al grupo");
+          if (Contactos.hayConversacionCon(nGrupo))
+            Contactos.addMensaje(nGrupo, m);
+          // TODO: añadir al usuario a la lista de miembros de nGrupo
+        } else {
+          Contactos.iniciaConversacionCon(nGrupo, true);
+          // TODO: ¿cómo avisar al usuario de que ha entrado al grupo?
+        }
         break;
       case 1997:
       case 1998:
         String nombre = m.getUsuario();
+        if (Soy(nombre)) return;
         esMensaje = !Contactos.convActualEsGrupo() /* || TODO: método que dé si el usuario estaba en el grupo */;
         boolean conectado = m.getCodigo() == 1997;
         m = new Mensaje(0, nombre + " se ha " + (conectado ? "" : "des") + "conectado."); // Mensaje que se mostrará al cliente
@@ -125,6 +135,10 @@ public class ClienteChat {
   private static ObjectOutputStream outStream = null;
   private static String nombre = null;
   private static Scanner scanner = new Scanner(System.in);
+
+  public static String getNombre() {
+    return nombre;
+  }
 
   // Pregunta algo al cliente, que responde desde teclado
   public static String ask(String texto) {
@@ -189,7 +203,8 @@ public class ClienteChat {
           programMessage("Ya estás conversando " + (Contactos.convActualEsGrupo() ? "en" : "con")
                             + " " + argumentos + ".\n");
         else {
-          // TODO: ¿debería fallar si el objetivo no está conectado?
+          // TODO: ¿debería fallar si el usuario o grupo objetivo no está conectado?
+          // TODO: ¿debería fallar si no está en el grupo?
           // TODO: clear?
           boolean es_grupo = false; // TODO
           programMessage("\nAhora estás hablando " + (es_grupo ? "en" : "con") + " " + argumentos + ".\n");

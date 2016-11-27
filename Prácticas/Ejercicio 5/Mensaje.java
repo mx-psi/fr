@@ -67,6 +67,11 @@ public class Mensaje implements java.io.Serializable {
     this.usuario = usuario;
   }
 
+  // Establece el grupo
+  public void setGrupo(String grupo) {
+    this.grupo = grupo;
+  }
+
   // Obtiene el código del mensaje
   public int getCodigo() {
     return codigo;
