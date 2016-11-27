@@ -102,7 +102,7 @@ public class ServidorChat {
       port = Integer.parseInt(args[0]);
 
     clientes = new HashMap<String,Cliente>(2*maxExpectedClients, (float) 1/2);
-    grupos   = new HashMap<String,Grupo>(2*maxExpectedGroups , (float) 1/2);
+    grupos   = new HashMap<String,Grupo>  (2*maxExpectedGroups , (float) 1/2);
     if (initializeServerSocket()) {
       System.out.println("Esperando conexiones a través del puerto " + port + "...");
       keepListening();

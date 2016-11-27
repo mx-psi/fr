@@ -1,3 +1,4 @@
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
@@ -74,7 +75,7 @@ public class Mensaje implements java.io.Serializable {
   // Obtiene el contenido en forma de string
   public String getContenido() {
     if (ruta.equals("/string"))
-      return new String(contenido, 0, contenido.length);
+      return new String(contenido, 0, contenido.length, StandardCharsets.UTF_8);
 
     return "*Fichero: " + ruta + "*";
   }
