@@ -65,6 +65,15 @@ public class ServidorChat {
     return true;
   }
 
+  // Disuelve un grupo vacío
+  public static boolean removeGroup(String name) {
+    if (!grupos.containsKey(name) || grupos.get(name).esPermanente())
+      return false;
+
+    grupos.remove(name);
+    return true;
+  }
+
   // Añade un cliente a un grupo
   public static boolean addClientToGroup(String grupo, String cliente, String solicitante) {
     if (!grupos.containsKey(grupo))
@@ -103,6 +112,7 @@ public class ServidorChat {
 
     clientes = new HashMap<String,Cliente>(2*maxExpectedClients, (float) 1/2);
     grupos   = new HashMap<String,Grupo>  (2*maxExpectedGroups , (float) 1/2);
+    addGroup("Global", null);   // Crea un grupo para todos los usuarios conectados
     if (initializeServerSocket()) {
       System.out.println("Esperando conexiones a través del puerto " + port + "...");
       keepListening();

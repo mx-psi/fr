@@ -35,6 +35,7 @@ class Escuchador extends Thread {
 
   private void parse(Mensaje m) {
     String conv = m.getConversacion();
+    String nombre;
     boolean esMensaje = false;
 
     switch(m.getCodigo()){
@@ -57,7 +58,7 @@ class Escuchador extends Thread {
         leerFichero(m);
         break;
       case 1996:
-        String nombre = m.getUsuario();
+        nombre = m.getUsuario();
         String nGrupo = m.getGrupo();
         esMensaje = !Soy(nombre);
         if (esMensaje) {
@@ -72,7 +73,7 @@ class Escuchador extends Thread {
         break;
       case 1997:
       case 1998:
-        String nombre = m.getUsuario();
+        nombre = m.getUsuario();
         if (Soy(nombre)) return;
         esMensaje = !Contactos.convActualEsGrupo() /* || TODO: método que dé si el usuario estaba en el grupo */;
         boolean conectado = m.getCodigo() == 1997;
@@ -213,6 +214,8 @@ public class ClienteChat {
         }
         return true;
       // TODO: comandos para crear grupo, añadir a alguien a un grupo y tal vez ver quién hay en un grupo
+      // TODO: comandos para ver quién la lista de conectados
+      // TODO: comando para ver los comandos
       case "s":
       case "send":
       case "envia":
@@ -234,7 +237,8 @@ public class ClienteChat {
       host = nl;
 
     nombre = ask("Escoge un nombre de usuario");
-    Contactos.setConvActual(nombre);
+    Contactos.iniciaConversacionCon("Global", true);    // Entra en el grupo Global
+    Contactos.setConvActual("Global");
 
 		try {
 		  // Envía el nombre
@@ -282,7 +286,7 @@ public class ClienteChat {
           if (esComando(mensaje))
             persiste = parseComando(mensaje);
           else {
-            aEnviar = new Mensaje(Contactos.getConvActual(), mensaje);
+            aEnviar = new Mensaje(Contactos.getConvActual(), mensaje, Contactos.convActualEsGrupo());
             outStream.writeObject(aEnviar);
           }
         }

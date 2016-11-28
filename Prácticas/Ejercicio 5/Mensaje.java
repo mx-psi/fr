@@ -20,24 +20,18 @@ public class Mensaje implements java.io.Serializable {
     esDeChat = false;
   }
   
-  // Constructor de mensajes a un solo contacto
-  public Mensaje(String usuario, String contenido){
-    this.codigo = 1001;
-    this.usuario = usuario;
+  // Constructor de mensajes
+  public Mensaje(String destino, String contenido, boolean grupo) {
+    if (grupo) {
+      this.codigo = 1002;
+      this.grupo = destino;
+    } else {
+      this.codigo = 1001;
+      this.usuario = destino;
+    }
     this.date = new Date();
     this.ruta = "/string";
     this.contenido = contenido.getBytes(StandardCharsets.UTF_8);
-    esDeChat = true;
-  }
-    
-  // Constructor de mensajes en grupo
-  public Mensaje(String usuario, String contenido, String grupo) {
-    this.codigo = 1002;
-    this.usuario = usuario;
-    this.date = new Date();
-    this.ruta = "/string";
-    this.contenido = contenido.getBytes(StandardCharsets.UTF_8);
-    this.grupo = grupo;
     esDeChat = true;
   }
 
