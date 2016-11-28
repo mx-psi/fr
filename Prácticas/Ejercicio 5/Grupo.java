@@ -38,7 +38,10 @@ public class Grupo {
     }
 
     clientes.add(nuevo);
-    // TODO: mandar mensaje TCP conveniente a los clientes del grupo y al añadido
+    Mensaje m = new Mensage(1996, "");
+    m.setUsuario(nuevo.getName());
+    m.setGrupo(groupName);
+    sendMessage(m);
     return true;
   }
 

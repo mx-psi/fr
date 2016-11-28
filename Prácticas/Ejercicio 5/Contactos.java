@@ -53,7 +53,7 @@ public class Contactos {
   }
 
   public static boolean convActualEsGrupo() {
-    return mensajes.get(convActual).esGrupo();
+    return getMensajes() != null && getMensajes().esGrupo();
   }
 
   // Devuelve 1 en caso de éxito, 0 si no ha cambiado la conversación

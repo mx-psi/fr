@@ -65,7 +65,11 @@ public class Cliente extends Thread {
   // Se llama tras un acceso correcto
   private void login() {
     sendMessage(new Mensaje(1000, name));  // Confirma nombre de usuario
-    // TODO. Podría mandar una lista de usuarios y/o avisar al resto de usuarios
+    System.out.println("El cliente " + name + " se ha conectado");
+    Mensaje m = new Mensaje(1997, "");
+    m.setUsuario(name);
+    ServidorChat.sendToAllClients(m);
+    // TODO: mandar una lista de usuarios
   }
   
   // Envía el mensaje mensaje al cliente
