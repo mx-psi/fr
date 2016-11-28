@@ -29,6 +29,7 @@ Para dar soporte a este servicio el protocolo implementado consta de 5 tipos de 
 | 1001       | *username* + ; + *time* + ; + *contenido* | Solicita el envío de *contenido* al **usuario** de nombre *username* |
 | 1002       | *groupname* + ; + *time* + ; + *contenido* | Solicita el envío de *contenido* al **grupo** de nombre *groupname* |
 | 1003       | *groupname* + ; + *username*| El cliente solicita que se añada *username* a *groupname*. Si el grupo no existe se creará. |
+| 1004       | *usuario* + ; + *fichero*| El cliente solicita que se añada *username* a *groupname*. Si el grupo no existe se creará. |
 | 1999       | *bye* | El cliente solicita su desconexión |
 
 ## Servidor
