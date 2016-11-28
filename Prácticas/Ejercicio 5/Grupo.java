@@ -40,7 +40,6 @@ public class Grupo {
 
   // Devuelve true en caso de éxito, false si ya estaba
   public boolean addMember(Cliente nuevo, Cliente solicitante) {
-    System.out.println(nuevo.getClientName());
     if (clientes.size() == maxClientes) {
       solicitante.sendMessage(new Mensaje(2006,getName()));
       return false;

@@ -213,9 +213,29 @@ public class ClienteChat {
           Contactos.mostrarMensajes();
         }
         return true;
-      // TODO: comandos para crear grupo, añadir a alguien a un grupo y tal vez ver quién hay en un grupo
-      // TODO: comandos para ver quién la lista de conectados
-      // TODO: comando para ver los comandos
+      case "g":
+      case "grupo":
+      case "group":
+      case "newgroup":
+        programMessage("TODO"); // TODO: comando para crear grupo
+        return true;
+      case "a":
+      case "add":
+      case "anadir":
+        programMessage("TODO"); // TODO: comando para añadir a alguien al grupo actual
+        return true;
+      // TODO: comandos para ver la lista de conectados y la de miembros de un grupo en particular
+      case "h":
+      case "?":
+      case "help":
+      case "comandos":
+        programMessage("Lista de comandos:\n"
+                     + "/a usuario: añadir a un usuario al grupo actual"
+                     + "/c usuario/grupo: pasar a hablar con un usuario o grupo\n"
+                     + "/g grupo: crear un grupo"
+                     + "/s archivo: mandar un archivo\n"
+                     + "/q: salir\n");  // TODO: añadir el resto de comandos
+        return true;
       case "s":
       case "send":
       case "envia":
@@ -259,7 +279,7 @@ public class ClienteChat {
         return;
       }
 
-      programMessage("¡Conectado con éxito!\n");
+      programMessage("¡Conectado con éxito!\nUsa /help para ver la lista de comandos\n\n");
       // TODO: si el servidor va a mandar más información, escucharla aquí
 
       // Empieza a escuchar mensajes en paralelo
