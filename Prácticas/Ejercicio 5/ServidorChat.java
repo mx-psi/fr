@@ -82,6 +82,11 @@ public class ServidorChat {
     return grupos.get(grupo).addMember(clientes.get(cliente));
   }
 
+  // Añade un cliente al grupo global
+  public static void addClientToGlobalGroup(String cliente) {
+    grupos.get("Global").addMember(clientes.get(cliente));
+  }
+
   // Envía un mensaje al cliente con nombre "destino"
   public static boolean sendToClient(String destino, Mensaje message) {
     if (!clientes.containsKey(destino))
