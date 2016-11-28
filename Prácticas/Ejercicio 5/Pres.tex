@@ -87,16 +87,79 @@ public class Mensaje implements java.io.Serializable {
 \end{lstlisting}
 \end{frame}
 
-\begin{frame}{Parte del cliente}
-  % TODO: Explicar que tiene dos hebras: una escucha y otra envía
+\begin{frame}[fragile]{Hebra que envía}
+  Hay dos hebras: una escucha los mensajes del servidor y otra envía.
+\begin{lstlisting}
+do {
+mssg = scanner.nextLine().trim();
+if (mssg != null && !mssg.equals("")) {
+  if (esComando(mssg))
+    persiste = parseComando(mssg);
+  else {
+    aEnviar = new Mensaje(Contactos.getActual(), mssg);
+    outStream.writeObject(aEnviar);
+  }
+}
+} while (persiste);
+\end{lstlisting}
 \end{frame}
 
-\begin{frame}{Conversaciones}
-  % TODO: Explicar conversaciones con grupos y con personas individuales
+\begin{frame}[fragile]{Hebra que escucha}
+  La hebra que escucha lee mensajes y dependiendo del código los añade al historial de la conversación adecuada:
+\begin{lstlisting}
+while((m = (Mensaje) in.readObject()) != null) {
+  parse(m);
+\end{lstlisting}
+
+Y en \texttt{parse}:
+
+\begin{lstlisting}
+switch(m.getCodigo()){
+  //...
+  case 1001:
+  case 1002:
+    esMensaje = true;
+    Contactos.addMensaje(conv,m);
+    break;
+  case 1004:
+    esMensaje = true;
+    leerFichero(m);
+    break;
+  //...
+}
+\end{lstlisting}
 \end{frame}
 
-\begin{frame}{Envío de ficheros}
-  % TODO: Explicar por encima el envío de ficheros
+\begin{frame}[fragile]{Conversaciones}
+
+  Las conversaciones pueden ser con grupos:
+\begin{lstlisting}
+public class Grupo {
+private String groupName;
+private ArrayList<Cliente> clientes;
+private static final int maxClientes = 512;
+
+//...
+
+public void sendMessage(Mensaje mensaje) {
+for (Cliente c:clientes)
+  c.sendMessage(mensaje);
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Envío de ficheros}
+  Los mensajes pueden enviar ficheros:
+  \begin{lstlisting}
+private void leerFichero(Mensaje m) {
+ FileOutputStream fos = new FileOutputStream("./Recibidos/" + m.getRuta());
+ BufferedOutputStream bos = new BufferedOutputStream(fos);
+ byte[] contenido = m.getRawContenido();
+ bos.write(contenido, 0, contenido.length);
+ bos.flush();
+}
+  \end{lstlisting}
+
 \end{frame}
 
 \end{document}
