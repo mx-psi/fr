@@ -19,26 +19,16 @@ public class YodafyServidorIterativo {
 		int bytesLeidos=0;
 		
 		try {
-			// Abrimos el socket en modo pasivo, escuchando el en puerto indicado por "port"
-			 DatagramSocket socketServidor = new DatagramSocket(port);
 			// Mientras ... siempre!
+  		 DatagramSocket socketServidor = new DatagramSocket(port);
 			do {
-
-				try{
-  				socketServicio = socketServidor.accept(); //TODO: Modificar para UDP
-				} catch(IOException e){
-				  System.out.println("Error: no se pudo aceptar la conexión solicitada");
-				}				
-				// Creamos un objeto de la clase ProcesadorYodafy, pasándole como 
-				// argumento el nuevo socket, para que realice el procesamiento
-				// Este esquema permite que se puedan usar hebras más fácilmente.
-				ProcesadorYodafy procesador=new ProcesadorYodafy(socketServicio);
-				procesador.procesa();
-				
+			 // Abrimos el socket en modo pasivo, escuchando el en puerto indicado por "port"
+			 ProcesadorYodafy procesador=new ProcesadorYodafy(socketServidor);
+			 procesador.procesa();
 			} while (true);
 			
 		} catch (IOException e) {
-			System.err.println("Error al escuchar en el puerto "+port);
+			System.err.println("Error al escuchar en el puerto " + port);
 		}
 
 	}

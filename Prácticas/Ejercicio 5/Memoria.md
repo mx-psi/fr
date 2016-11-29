@@ -11,48 +11,77 @@ Nuestro protocolo de aplicación consiste en la implementación de un **servicio
 - **Usuarios** (clientes): Los usuarios mandan mensajes a otros usuarios a través del servidor, tanto a usuarios individuales como a grupos de usuarios que definen previamente
 - **Servidor**: El servidor recibe los mensajes de los clientes y gestiona su envío a su destinatario o destinatarios, incluyendo la información necesaria para su correcta decodificación
 
-<!--TODO: Los usuarios se loguean en el servicio?-->
+Para dar soporte a este servicio el protocolo implementado consta de 4 tipos de mensajes: mensajes de texto usuales, petición de creación de grupos y de reserva de nombres de usuario y mensajes de error (cuando no existe un grupo o usuario o no ha sido posible el envío de un mensaje).
 
-Para dar soporte a este servicio el protocolo implementado consta de 5 tipos de mensajes: mensajes enviados de los usuarios al servidor, petición de creación de grupos y de reserva de nombres de usuario, mensajes enviados del servidor a los usuarios y mensajes de error (cuando no existe un grupo o usuario o no ha sido posible el envío de un mensaje).
+\newpage
 
 # Diagrama de estados del servidor
 
 <!-- TODO: Hacer el diagrama como con los autómatas?-->
+
+\newpage
 
 # Mensajes que intervienen
 
 ## Cliente
 
 | **Código** | **Cuerpo** | **Descripción**|
-|------------|------------|----------------|
-| 1000       | *username* | El cliente solicita que su nombre sea *username*. |
-| 1001       | *username* + ; + *time* + ; + *contenido* | Solicita el envío de *contenido* al **usuario** de nombre *username* |
-| 1002       | *groupname* + ; + *time* + ; + *contenido* | Solicita el envío de *contenido* al **grupo** de nombre *groupname* |
-| 1003       | *groupname* + ; + *username* | El cliente solicita que se añada *username* a *groupname*. Si el grupo no existe se creará. |
-| 1004       | *name* + ; + *fichero* | El cliente manda el fichero *fichero* al usuario o grupo *name* |
-| 1996       | *groupname* | El cliente solicita la lista de usuarios del grupo *groupname* |
-| 1999       | *bye* | El cliente solicita su desconexión |
+|------------|-----------------------|--------------------------------|
+| 1000       | *user* | El cliente solicita el nombre *user* |
+| 1001       | *user*, *time*, *contenido* | Envío de *contenido* a *user* |
+| 1002       | *group*, *time*, *contenido* | Envío de *contenido* a *group* |
+| 1003       | *group*, *user* | Solicita que se añada *user* a *group*. Si el grupo no existe se creará. |
+| 1004       | *user*  *fichero* | Solicita el envío de *fichero* a *user* |
+| 1996       | *group* | Solicita la lista de usuarios del grupo *groupname* |
+| 1999       | bye | El cliente solicita su desconexión |
 
 ## Servidor
 
 | **Código** | **Cuerpo** | **Descripción** |
-|------------|------------|-----------------|
-| 2001 | *username* | El usuario *username* no existe |
-| 2002 | *groupname* | El grupo *groupname* no existe |
-| 2003 | *tipo* | El tipo *tipo* no se ha reconocido como un tipo de mensaje válido |
+|------------|------------------------|---------------------------------|
+| 2001 | *user* | El usuario *user* no existe |
+| 2002 | *group* | El grupo *group* no existe |
 | 2004 | *ERROR* | El último mensaje enviado estaba mal formado |
-| 2005 | *groupname* | *username* | El usuario *username* ya estaba en el grupo *groupname* |
-| 2006 | *groupname* | El grupo *groupname* está lleno |
-| 2007 | *username* | El nombre *username* es inválido |
-| 2008 | *username* | El nombre *username* está siendo usado |
-| 1000 | *username* | Petición de nombre de usuario aceptada |
-| 1001 | *username* + ; + *time* + ; + *mensaje* | El usuario *username* ha enviado en el tiempo *time* el mensaje *mensaje* |
-| 1002 | *groupname* + ; + *username* + ; + *time* + ; + *mensaje* | El usuario *username* ha enviado en el grupo *groupname* en el tiempo *time* el mensaje *mensaje* |
+| 2005 | *group* | *user* | El usuario *user* ya estaba en el grupo *group* |
+| 2006 | *group* | El grupo *group* está lleno |
+| 2007 | *user* | El nombre *user* es inválido |
+| 2008 | *user* | El nombre *user* está siendo usado |
+| 1000 | *user* | Petición de nombre de usuario aceptada |
+| 1001 | *user*, *time*, *mensaje* | *user* ha enviado en el tiempo *time* el mensaje *mensaje* |
+| 1002 | *group*, *user*, *time*, *mensaje* | *user* ha enviado en *group* en el tiempo *time* el mensaje *mensaje* |
 | 1994 | *end* | Indica el fin de la recepción de información de login |
-| 1995 | *groupname* | Indica la existencia o la creación del grupo *groupname* |
-| 1996 | *username* + ; + *groupname* | Indica la entrada de *username* al grupo *groupname* |
-| 1997 | *username* | Indica a un cliente la conexión de otro cliente *username* |
-| 1998 | *username* | Indica a un cliente la desconexión de otro cliente *username* |
+| 1995 | *group* | Indica la existencia o la creación del grupo *group* |
+| 1996 | *user*, *group* | *user* ha entrado al grupo *group* |
+| 1997 | *user* | *user* se ha conectado |
+| 1998 | *user* | *user* se ha desconectado |
 
+\newpage
 
 # Evaluación de la aplicación
+
+## Conexión y comandos
+
+En primer lugar los usuarios deben conectarse al servicio, proporcionando la dirección del servidor, un nombre de usuario válido y su contraseña. A continuación pueden utilizar los siguientes comandos para navegar:
+
+- `/close`, `/exit`, `/quit`, `/q`, `/salir`: Cierra la conexión
+- `conversacion`, `c`: Cambia la conversación a la indicada
+
+La conexión se muestra así:
+
+<!-- Imagen del proceso de conexión completo y entrar en un chat-->
+
+## Grupos
+
+El sistema permite la creación de grupos. Los comandos adecuados son:
+
+<!--Lista de comandos-->
+
+Los grupos se muestran así:
+
+<!-- Imagen de creación y añadido en un grupo con usuarios conectándose y desconectándose-->
+
+## Envío de ficheros
+
+El envío de ficheros se realiza con el comando `/send`. Los usuarios receptores deben disponer de una carpeta *Recibidos* que no tenga un archivo con el mismo nombre del enviado. El envío se muestra así en cada usuario:
+
+<!--Dos imágenes que muestren el envío con send y la recepción-->
