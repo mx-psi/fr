@@ -5,9 +5,11 @@
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.Socket;
-import java.util.Random;
 
+import java.util.Random;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 
 //
 // Nota: si esta clase extendiera la clase Thread, y el procesamiento lo hiciera el método "run()",
@@ -15,7 +17,7 @@ import java.util.Random;
 //
 public class ProcesadorYodafy {
 	// Referencia a un socket para enviar/recibir las peticiones/respuestas
-	private Socket socketServicio;
+	private DatagramSocket socketServicio;
 	// stream de lectura (por aquí se recibe lo que envía el cliente)
 	private InputStream inputStream;
 	// stream de escritura (por aquí se envía los datos al cliente)
@@ -25,7 +27,7 @@ public class ProcesadorYodafy {
 	private Random random;
 	
 	// Constructor que tiene como parámetro una referencia al socket abierto en por otra clase
-	public ProcesadorYodafy(Socket socketServicio) {
+	public ProcesadorYodafy(DatagramSocket socketServicio) {
 		this.socketServicio=socketServicio;
 		random=new Random();
 	}
@@ -46,20 +48,27 @@ public class ProcesadorYodafy {
 			
 			// Lee la frase a Yodaficar:
 			////////////////////////////////////////////////////////
-			//TODO
+			DatagramPacket paquete = new DatagramPacket(datosRecibidos,datosRecibidos.length);
+			socketServicio.receive(paquete);
+			paquete.getData();
 			////////////////////////////////////////////////////////
 			
 			// Yoda hace su magia:
 			// Creamos un String a partir de un array de bytes de tamaño "bytesRecibidos":
-			String peticion=new String(datosRecibidos,0,bytesRecibidos);
+			String peticion=new String(datosRecibidos);
 			// Yoda reinterpreta el mensaje:
 			String respuesta=yodaDo(peticion);
 			// Convertimos el String de respuesta en una array de bytes:
 			datosEnviar=respuesta.getBytes();
+
+      InetAddress direccion = paquete.getAddress();
+      int puerto = paquete.getPort();
+
 			
 			// Enviamos la traducción de Yoda:
 			////////////////////////////////////////////////////////
-			//TODO
+      paquete = new DatagramPacket(datosEnviar, datosEnviar.length, direccion, puerto);
+      socketServicio.send(paquete);
 			////////////////////////////////////////////////////////
 			
 			
