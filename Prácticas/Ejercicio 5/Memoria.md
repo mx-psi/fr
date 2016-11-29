@@ -30,6 +30,7 @@ Para dar soporte a este servicio el protocolo implementado consta de 5 tipos de 
 | 1002       | *groupname* + ; + *time* + ; + *contenido* | Solicita el envío de *contenido* al **grupo** de nombre *groupname* |
 | 1003       | *groupname* + ; + *username* | El cliente solicita que se añada *username* a *groupname*. Si el grupo no existe se creará. |
 | 1004       | *name* + ; + *fichero* | El cliente manda el fichero *fichero* al usuario o grupo *name* |
+| 1996       | *groupname* | El cliente solicita la lista de usuarios del grupo *groupname* |
 | 1999       | *bye* | El cliente solicita su desconexión |
 
 ## Servidor
@@ -47,6 +48,8 @@ Para dar soporte a este servicio el protocolo implementado consta de 5 tipos de 
 | 1000 | *username* | Petición de nombre de usuario aceptada |
 | 1001 | *username* + ; + *time* + ; + *mensaje* | El usuario *username* ha enviado en el tiempo *time* el mensaje *mensaje* |
 | 1002 | *groupname* + ; + *username* + ; + *time* + ; + *mensaje* | El usuario *username* ha enviado en el grupo *groupname* en el tiempo *time* el mensaje *mensaje* |
+| 1994 | *end* | Indica el fin de la recepción de información de login |
+| 1995 | *groupname* | Indica la existencia o la creación del grupo *groupname* |
 | 1996 | *username* + ; + *groupname* | Indica la entrada de *username* al grupo *groupname* |
 | 1997 | *username* | Indica a un cliente la conexión de otro cliente *username* |
 | 1998 | *username* | Indica a un cliente la desconexión de otro cliente *username* |

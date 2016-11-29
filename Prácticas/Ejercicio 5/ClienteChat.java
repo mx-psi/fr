@@ -10,6 +10,9 @@ import java.net.UnknownHostException;
 
 import java.util.Scanner;
 import java.util.Date;
+import java.util.TreeSet;
+import java.util.TreeMap;
+import java.util.NoSuchElementException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -136,6 +139,8 @@ public class ClienteChat {
   private static ObjectOutputStream outStream = null;
   private static String nombre = null;
   private static Scanner scanner = new Scanner(System.in);
+  private static TreeSet<String> usuarios;
+  private static TreeMap<String, TreeSet<String>> grupos;
 
   public static String getNombre() {
     return nombre;
@@ -257,8 +262,6 @@ public class ClienteChat {
       host = nl;
 
     nombre = ask("Escoge un nombre de usuario");
-    Contactos.iniciaConversacionCon("Global", true);    // Entra en el grupo Global
-    Contactos.setConvActual("Global");
 
 		try {
 		  // Envía el nombre
@@ -280,7 +283,34 @@ public class ClienteChat {
       }
 
       programMessage("¡Conectado con éxito!\nUsa /help para ver la lista de comandos\n\n");
-      // TODO: si el servidor va a mandar más información, escucharla aquí
+      Contactos.iniciaConversacionCon("Global", true);    // Entra en el grupo Global
+      Contactos.setConvActual("Global");
+      usuarios = new TreeSet<String>();
+      grupos = new TreeMap<String, TreeSet<String>>();
+
+      // Obtiene las listas de usuarios y grupos
+      Mensaje datos = (Mensaje) ois.readObject();
+      while(datos.getCodigo() == 1995) {
+        grupos.put(datos.getContenido(), new TreeSet<String>());
+        datos = (Mensaje) ois.readObject();
+      }
+      while(datos.getCodigo() == 1997) {
+        usuarios.add(datos.getContenido());
+        datos = (Mensaje) ois.readObject();
+      }
+      if (datos.getCodigo() != 1994 || !datos.getContenido().equals("end"))
+        error("Error: el servidor no ha terminado de mandar información como se esperaba");
+
+      // Obtiene la lista de usuarios del grupo Global
+      outStream.writeObject(new Mensaje(1996, "Global"));
+      datos = (Mensaje) ois.readObject();
+      TreeSet<String> global = grupos.get("Global");  // TODO: debería manejarse si falla
+      while(datos.getCodigo() == 1996) {
+        usuarios.add(datos.getContenido());
+        datos = (Mensaje) ois.readObject();
+      }
+      if (datos.getCodigo() != 1994 || !datos.getContenido().equals("end"))
+        error("Error: el servidor no ha terminado de mandar información como se esperaba");
 
       // Empieza a escuchar mensajes en paralelo
       esc = new Escuchador(ois);
@@ -315,6 +345,6 @@ public class ClienteChat {
       outStream.writeObject(new Mensaje(1999,"bye"));
     } catch (IOException e) {
 			error("Error durante el envío");
-		}
+		} catch(NoSuchElementException e) {}
 	}
 }

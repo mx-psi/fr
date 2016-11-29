@@ -38,6 +38,16 @@ public class Grupo {
       c.sendMessage(mensaje);
   }
 
+  // Envía la lista de miembros del grupo
+  public void sendMembers(Cliente usuario) {
+    Mensaje m = new Mensaje(1996, "");
+    m.setGrupo(groupName);
+    for (Cliente c:clientes) {
+      m.setUsuario(c.getClientName());
+      usuario.sendMessage(m);
+    }
+  }
+
   // Devuelve true en caso de éxito, false si ya estaba
   public boolean addMember(Cliente nuevo, Cliente solicitante) {
     if (clientes.size() == maxClientes) {
