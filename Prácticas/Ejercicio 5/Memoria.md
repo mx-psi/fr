@@ -33,11 +33,12 @@ En cualquier momento un usuario puede solicitar su desconexión. En este momento
 
 | **Código** | **Cuerpo** | **Descripción**|
 |------------|-----------------------|--------------------------------|
-| 1000       | *user* | El cliente solicita el nombre *user*. |
-| 1001       | *user* , *time* , *contenido* | Envío de *contenido* a *user* |
-| 1002       | *group* , *time* , *contenido* | Envío de *contenido* a *group* |
-| 1003       | *group* , *user*| Solicita que se añada *user* a *group*. Si el grupo no existe se creará. |
-| 1004       | *user*  *fichero*| Solicita el envío de *fichero* a *user* |
+| 1000       | *user* | El cliente solicita el nombre *user* |
+| 1001       | *user*, *time*, *contenido* | Envío de *contenido* a *user* |
+| 1002       | *group*, *time*, *contenido* | Envío de *contenido* a *group* |
+| 1003       | *group*, *user* | Solicita que se añada *user* a *group*. Si el grupo no existe se creará. |
+| 1004       | *user*  *fichero* | Solicita el envío de *fichero* a *user* |
+| 1996       | *group* | Solicita la lista de usuarios del grupo *groupname* |
 | 1999       | bye | El cliente solicita su desconexión |
 
 ## Servidor
@@ -52,11 +53,13 @@ En cualquier momento un usuario puede solicitar su desconexión. En este momento
 | 2007 | *user* | El nombre *user* es inválido |
 | 2008 | *user* | El nombre *user* está siendo usado |
 | 1000 | *user* | Petición de nombre de usuario aceptada |
-| 1001 | *user* , *time* , *mensaje* | *user* ha enviado en el tiempo *time* el mensaje *mensaje* |
-| 1002 | *group* , *user* , *time* , *mensaje* | *user* ha enviado en *group* en el tiempo *time* el mensaje *mensaje* |
-| 1996 | *user* , *group* | *user* ha entrado al grupo *group* |
-| 1997 | *user* | *user* se ha conectado|
-| 1998 | *user* | *user* se ha desconectado|
+| 1001 | *user*, *time*, *mensaje* | *user* ha enviado en el tiempo *time* el mensaje *mensaje* |
+| 1002 | *group*, *user*, *time*, *mensaje* | *user* ha enviado en *group* en el tiempo *time* el mensaje *mensaje* |
+| 1994 | *end* | Indica el fin de la recepción de información de login |
+| 1995 | *group* | Indica la existencia o la creación del grupo *group* |
+| 1996 | *user*, *group* | *user* ha entrado al grupo *group* |
+| 1997 | *user* | *user* se ha conectado |
+| 1998 | *user* | *user* se ha desconectado |
 
 \newpage
 

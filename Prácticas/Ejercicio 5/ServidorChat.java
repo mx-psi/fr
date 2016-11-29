@@ -62,6 +62,7 @@ public class ServidorChat {
       return false;
 
     grupos.put(nombre, new Grupo(nombre, creador));
+    sendToAllClients(new Mensaje(1995, nombre));
     return true;
   }
 
@@ -109,6 +110,27 @@ public class ServidorChat {
 
     grupos.get(nombregrupo).sendMessage(message);
     return true;
+  }
+
+  // Envía la lista de todos los grupos y todos los usuarios a un usuario
+  public static void sendGroupAndUserLists(Cliente usuario) {
+    for (String g:grupos.keySet())
+      usuario.sendMessage(new Mensaje(1995, g));
+
+    for (String c:clientes.keySet())
+      if (!usuario.getClientName().equals(c))
+        usuario.sendMessage(new Mensaje(1997, c));
+  }
+
+  // Envía la lista de los usuarios de un grupo a un usuario
+  public static void sendGroupMembers(Cliente usuario, String nombregrupo) {
+    if (!grupos.containsKey(nombregrupo)) {
+      usuario.sendMessage(new Mensaje(2002, nombregrupo));
+      return;
+    }
+
+    grupos.get(nombregrupo).sendMembers(usuario);
+    usuario.sendMessage(new Mensaje(1994, "end"));
   }
   
 	public static void main(String[] args) {

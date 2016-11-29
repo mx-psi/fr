@@ -68,9 +68,11 @@ public class Cliente extends Thread {
     System.out.println("El cliente " + name + " se ha conectado");
     Mensaje m = new Mensaje(1997, "");
     m.setUsuario(name);
+
+    ServidorChat.sendGroupAndUserLists(this);
     ServidorChat.sendToAllClients(m);
+    sendMessage(new Mensaje(1994, "end"));
     ServidorChat.addClientToGlobalGroup(name);
-    // TODO: mandar una lista de usuarios
   }
   
   // Envía el mensaje mensaje al cliente
@@ -128,8 +130,10 @@ public class Cliente extends Thread {
       case 1003: 
         ServidorChat.addClientToGroup(mensaje.getGrupo(), mensaje.getUsuario(), name);
         break;
+      case 1996:
+        ServidorChat.sendGroupMembers(this, mensaje.getContenido());
+        break;
       case 1999:
-        // TODO: avisar a otros clientes de la desconexión
         try {
           socket.shutdownOutput();
         } catch (IOException e) {}
