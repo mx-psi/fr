@@ -13,11 +13,17 @@ Nuestro protocolo de aplicación consiste en la implementación de un **servicio
 
 Para dar soporte a este servicio el protocolo implementado consta de 4 tipos de mensajes: mensajes de texto usuales, petición de creación de grupos y de reserva de nombres de usuario y mensajes de error (cuando no existe un grupo o usuario o no ha sido posible el envío de un mensaje).
 
+Se utilizan 2 hebras en cada cliente para escuchar y enviar y $n +1$ hebras en el servidor donde $n$ es el número de usuarios conectados.
+
 \newpage
 
-# Diagrama de estados del servidor
+# Diagrama de estados
 
-<!-- TODO: Hacer el diagrama como con los autómatas?-->
+![Diagrama de estados](diagrama.png)
+
+Los únicos estados disponibles son con y sin nombre. Un usuario no puede realizar ninguna acción si no tiene nombre. Una vez solicita uno, si este está disponible y es correcto (cumple con las especificaciones de longitud y conjunto de caracteres a utilizar) puede realizar cualquier otra opción.
+
+En cualquier momento un usuario puede solicitar su desconexión. En este momento el servidor enviara un mensaje al resto de usuarios indicando su desconexión y procederá a cerrar el socket que utilizaba con este cliente.
 
 \newpage
 
