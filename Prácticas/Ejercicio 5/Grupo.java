@@ -52,7 +52,7 @@ public class Grupo {
 
     clientes.add(nuevo);
     Mensaje m = new Mensaje(1996, "");
-    m.setUsuario(nuevo.getName());
+    m.setUsuario(nuevo.getClientName());
     m.setGrupo(groupName);
     sendMessage(m);
     return true;

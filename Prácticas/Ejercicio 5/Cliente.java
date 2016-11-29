@@ -69,6 +69,7 @@ public class Cliente extends Thread {
     Mensaje m = new Mensaje(1997, "");
     m.setUsuario(name);
     ServidorChat.sendToAllClients(m);
+    ServidorChat.addClientToGlobalGroup(name);
     // TODO: mandar una lista de usuarios
   }
   
