@@ -64,7 +64,7 @@ public class ServidorChat {
       return false;
 
     grupos.put(nombre, new Grupo(nombre, creador));
-    sendToAllClients(new Mensaje(1995, nombre));
+    sendToAllClients(new Mensaje(1995, "").setGrupo(nombre));
     return true;
   }
 
@@ -117,7 +117,7 @@ public class ServidorChat {
   // Envía la lista de todos los grupos y todos los usuarios a un usuario
   public static void sendGroupAndUserLists(Cliente usuario) {
     for (String g:grupos.keySet())
-      usuario.sendMessage(new Mensaje(1995, g));
+      usuario.sendMessage(new Mensaje(1995, "").setGrupo(g));
 
     Mensaje m;
     for (String c:clientes.keySet())

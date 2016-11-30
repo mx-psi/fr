@@ -57,13 +57,15 @@ public class Mensaje implements java.io.Serializable {
   }
 
   // Establece el usuario
-  public void setUsuario(String usuario) {
+  public Mensaje setUsuario(String usuario) {
     this.usuario = usuario;
+    return this;
   }
 
   // Establece el grupo
-  public void setGrupo(String grupo) {
+  public Mensaje setGrupo(String grupo) {
     this.grupo = grupo;
+    return this;
   }
 
   // Obtiene el código del mensaje

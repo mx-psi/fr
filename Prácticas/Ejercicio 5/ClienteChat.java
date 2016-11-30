@@ -51,6 +51,12 @@ class Escuchador extends Thread {
       case 2004:
         System.err.println("Error: El último mensaje estaba mal formado");
         break;
+      case 2005:
+        System.err.println("Error: " + m.getUsuario() + " ya está en " + m.getGrupo());
+        break;
+      case 2008:
+        System.err.println("Error: el nombre " + m.getContenido() + " está siendo usado");
+        break;
       case 1001:
       case 1002:
         esMensaje = true;
@@ -59,6 +65,9 @@ class Escuchador extends Thread {
       case 1004:
         esMensaje = true;
         leerFichero(m);
+        break;
+      case 1995:
+        ClienteChat.addGroup(m.getGrupo());
         break;
       case 1996:
         nombre = m.getUsuario();
@@ -70,8 +79,7 @@ class Escuchador extends Thread {
             Contactos.addMensaje(nGrupo, m);
 
           ClienteChat.addToGroupList(nombre, nGrupo);
-        } else {
-          // TODO: ¿debería comprobarse que el grupo está creado y vacío?
+        } else if (ClienteChat.groupIsReady(nGrupo)) {
           try {
             ClienteChat.askForMemberList(nGrupo);
             Mensaje datos = (Mensaje) in.readObject();
@@ -252,12 +260,25 @@ public class ClienteChat {
       case "grupo":
       case "group":
       case "newgroup":
-        programMessage("TODO\n"); // TODO: comando para crear grupo
+        Mensaje mng = new Mensaje(1993, "");
+        mng.setGrupo(argumentos);
+        try {
+          outStream.writeObject(mng);
+        } catch(IOException e) {}
         return true;
       case "a":
       case "add":
       case "anadir":
-        programMessage("TODO\n"); // TODO: comando para añadir a alguien al grupo actual
+        if (!Contactos.convActualEsGrupo()) {
+          programMessage("Esta conversación no es un grupo");
+          return true;
+        }
+        Mensaje mag = new Mensaje(1992, "");
+        mag.setUsuario(argumentos);
+        mag.setGrupo(Contactos.getConvActual());
+        try {
+          outStream.writeObject(mag);
+        } catch(IOException e) {}
         return true;
       case "u":
       case "users":
@@ -277,9 +298,9 @@ public class ClienteChat {
       case "help":
       case "comandos":
         programMessage("Lista de comandos:\n"
-                     + "/a usuario: añadir a un usuario al grupo actual"
+                     + "/a usuario: añadir a un usuario al grupo actual\n"
                      + "/c usuario/grupo: pasar a hablar con un usuario o grupo\n"
-                     + "/g grupo: crear un grupo"
+                     + "/g grupo: crear un grupo\n"
                      + "/m: ver lista de miembros del grupo actual\n"
                      + "/s archivo: mandar un archivo\n"
                      + "/u: ver lista de usuarios conectados\n"
@@ -296,6 +317,12 @@ public class ClienteChat {
     }
   }
 
+  // Añade un grupo a la lista de grupos
+  public static void addGroup(String nombre) {
+    if (!grupos.containsKey(nombre))
+      grupos.put(nombre, new TreeSet<String>());
+  }
+
   // Añade un usuario a la lista de conectados
   public static void addToUserList(String nombre) {
     usuarios.add(nombre);
@@ -304,6 +331,11 @@ public class ClienteChat {
   // Determina si un usuario está en la lista de conectados
   public static boolean isUser(String usuario) {
     return usuarios.contains(usuario);
+  }
+
+  // Determina si un grupo está en la lista de grupos pero sin miembros
+  public static boolean groupIsReady(String grupo) {
+    return grupos.containsKey(grupo) && grupos.get(grupo) == null;
   }
 
   // Añade un usuario a la lista de miembros de un grupo
@@ -411,7 +443,7 @@ public class ClienteChat {
       // Obtiene las listas de usuarios y grupos
       Mensaje datos = (Mensaje) ois.readObject();
       while(datos.getCodigo() == 1995) {
-        grupos.put(datos.getContenido(), new TreeSet<String>());
+        addGroup(datos.getGrupo());
         datos = (Mensaje) ois.readObject();
       }
       while(datos.getCodigo() == 1997) {

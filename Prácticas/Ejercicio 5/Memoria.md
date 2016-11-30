@@ -36,8 +36,10 @@ En cualquier momento un usuario puede solicitar su desconexión. En este momento
 | 1000       | *user* | El cliente solicita el nombre *user* |
 | 1001       | *user*, *time*, *contenido* | Envío de *contenido* a *user* |
 | 1002       | *group*, *time*, *contenido* | Envío de *contenido* a *group* |
-| 1003       | *user*, *group* | Solicita que se añada *user* a *group*. Si el grupo no existe se creará. |
+| 1003       | *user*, *group* | Solicita que se añada *user* a *group* |
 | 1004       | *user*, *nombrefichero*, *fichero* | Solicita el envío de *fichero* a *user* |
+| 1992       | *user*, *group* | Añade a *user* al grupo *group* |
+| 1993       | *group* | Solicita la creación del grupo *group |
 | 1996       | *group* | Solicita la lista de usuarios del grupo *group* |
 | 1999       | bye | El cliente solicita su desconexión |
 

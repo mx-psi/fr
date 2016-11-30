@@ -131,8 +131,20 @@ public class Cliente extends Thread {
         if (!ServidorChat.sendToGroup(destinatario, mensaje))
           sendMessage(new Mensaje(2002,destinatario));
         break;
-      case 1003: 
+      case 1003:
         ServidorChat.addClientToGroup(mensaje.getGrupo(), mensaje.getUsuario(), name);
+        break;
+      case 1992:
+        if (!ServidorChat.addClientToGroup(mensaje.getGrupo(), mensaje.getUsuario(), this.getClientName())) {
+          Mensaje m = new Mensaje(2005, "");
+          m.setUsuario(mensaje.getUsuario());
+          m.setGrupo(mensaje.getGrupo());
+          sendMessage(new Mensaje(2005, mensaje.getGrupo()));
+        }
+        break;
+      case 1993:
+        if (!ServidorChat.addGroup(mensaje.getGrupo(), this))
+          sendMessage(new Mensaje(2008, mensaje.getGrupo()));
         break;
       case 1996:
         ServidorChat.sendGroupMembers(this, mensaje.getContenido());
