@@ -3,6 +3,7 @@ import java.util.IllegalFormatException;
 import java.util.HashMap;
 import java.net.ServerSocket;
 
+
 /*
   Guarda la información de todos los clientes y grupos y escucha nuevas conexiones
 */
@@ -13,7 +14,7 @@ public class ServidorChat {
   private static HashMap<String, Grupo> grupos;
   private static final int maxExpectedClients = 32768;
   private static final int maxExpectedGroups = 64;
-  public static final int MAX_NAME_LENGTH 15;
+  public static final int MAX_NAME_LENGTH = 15;
 
   private static boolean initializeServerSocket() {
     try {
