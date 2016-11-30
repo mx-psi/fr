@@ -13,6 +13,7 @@ public class ServidorChat {
   private static HashMap<String, Grupo> grupos;
   private static final int maxExpectedClients = 32768;
   private static final int maxExpectedGroups = 64;
+  public static final int MAX_NAME_LENGTH 15;
 
   private static boolean initializeServerSocket() {
     try {
@@ -117,9 +118,13 @@ public class ServidorChat {
     for (String g:grupos.keySet())
       usuario.sendMessage(new Mensaje(1995, g));
 
+    Mensaje m;
     for (String c:clientes.keySet())
-      if (!usuario.getClientName().equals(c))
-        usuario.sendMessage(new Mensaje(1997, c));
+      if (!usuario.getClientName().equals(c)) {
+        m = new Mensaje(1997, "");
+        m.setUsuario(c);
+        usuario.sendMessage(m);
+      }
   }
 
   // Envía la lista de los usuarios de un grupo a un usuario
