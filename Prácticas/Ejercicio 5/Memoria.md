@@ -8,8 +8,8 @@ date: Fundamentos de Redes
 
 Nuestro protocolo de aplicación consiste en la implementación de un **servicio de mensajería instantánea en tiempo real** con una arquitectura cliente-servidor. De esta forma, los actores que intervienen son:
 
-- **Usuarios** (clientes): Los usuarios mandan mensajes a otros usuarios a través del servidor, tanto a usuarios individuales como a grupos de usuarios que definen previamente
-- **Servidor**: El servidor recibe los mensajes de los clientes y gestiona su envío a su destinatario o destinatarios, incluyendo la información necesaria para su correcta decodificación
+- **Usuarios** (clientes): Los usuarios mandan mensajes a otros usuarios a través del servidor, tanto a usuarios individuales como a grupos de usuarios que definen previamente.
+- **Servidor**: El servidor recibe los mensajes de los clientes y gestiona su envío a su destinatario o destinatarios, incluyendo la información necesaria para su correcta decodificación.
 
 Para dar soporte a este servicio el protocolo implementado consta de 4 tipos de mensajes: mensajes de texto usuales, petición de creación de grupos y de reserva de nombres de usuario y mensajes de error (cuando no existe un grupo o usuario o no ha sido posible el envío de un mensaje).
 
@@ -71,16 +71,19 @@ En primer lugar los usuarios deben conectarse al servicio, proporcionando la dir
 
 - `/close`, `/exit`, `/quit`, `/q`, `/salir`: Cierra la conexión
 - `conversacion`, `c`: Cambia la conversación a la indicada
+- `usuarios`, `u`: Muestra los usuarios conectados
 
 La conexión se muestra así:
 
-<!-- Imagen del proceso de conexión completo y entrar en un chat-->
+![Conexión](conexion.png)
 
 ## Grupos
 
 El sistema permite la creación de grupos. Los comandos adecuados son:
 
-<!--Lista de comandos-->
+- `grupo`, `g`: Crea un grupo
+- `anadir`, `a`: Añade un usuario a un grupo
+- `miembros`, `m`: Muestra los usuarios del grupo actual
 
 Los grupos se muestran así:
 
@@ -90,4 +93,5 @@ Los grupos se muestran así:
 
 El envío de ficheros se realiza con el comando `/send`. Los usuarios receptores deben disponer de una carpeta *Recibidos* que no tenga un archivo con el mismo nombre del enviado. El envío se muestra así en cada usuario:
 
-<!--Dos imágenes que muestren el envío con send y la recepción-->
+![Receptor](receptor.png)
+![Emisor](emisor.png)
