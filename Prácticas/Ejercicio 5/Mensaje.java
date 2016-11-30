@@ -11,7 +11,7 @@ public class Mensaje implements java.io.Serializable {
   private byte[] contenido; // Contenido del mensaje
   public boolean esDeChat;  // indica si se trata de un mensaje de chat
   private static SimpleDateFormat ft = new SimpleDateFormat("HH:mm:ss");
-  
+
   // Constructor de mensajes informativos
   public Mensaje(int codigo, String contenido){
     this.codigo    = codigo;
