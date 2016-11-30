@@ -28,7 +28,8 @@ public class Cliente extends Thread {
     boolean repetido = false;
     if (primerMensaje.getCodigo() != 1000)
       error = 1;
-    else if (nombrePedido.length() > 15 || nombrePedido.length() < 1
+    else if (nombrePedido.getBytes(StandardCharsets.UTF_8).length() > ServidorChat.MAX_NAME_LENGTH
+              || nombrePedido.length() < 1
               || (repetido = ServidorChat.nombreUsado(nombrePedido)))
       error = 2;
 

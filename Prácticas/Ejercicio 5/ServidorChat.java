@@ -13,6 +13,7 @@ public class ServidorChat {
   private static HashMap<String, Grupo> grupos;
   private static final int maxExpectedClients = 32768;
   private static final int maxExpectedGroups = 64;
+  public static final int MAX_NAME_LENGTH 15;
 
   private static boolean initializeServerSocket() {
     try {
