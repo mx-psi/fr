@@ -13,6 +13,7 @@ public class Grupo {
     groupName = name;
 		clientes = new ArrayList<Cliente>();
     permanente = creador == null;
+    ServidorChat.sendToAllClients(new Mensaje(1995, "").setGrupo(name));
     if (!permanente)
       addMember(creador);
 	}

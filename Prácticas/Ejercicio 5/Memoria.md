@@ -89,7 +89,8 @@ El sistema permite la creación de grupos. Los comandos adecuados son:
 
 Los grupos se muestran así:
 
-<!-- Imagen de creación y añadido en un grupo con usuarios conectándose y desconectándose-->
+![Creador](creador_grupo.png)
+![Invitado](invitado.png)
 
 ## Envío de ficheros
 

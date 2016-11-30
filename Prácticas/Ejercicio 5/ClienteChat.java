@@ -80,23 +80,10 @@ class Escuchador extends Thread {
 
           ClienteChat.addToGroupList(nombre, nGrupo);
         } else if (ClienteChat.groupIsReady(nGrupo)) {
-          try {
-            ClienteChat.askForMemberList(nGrupo);
-            Mensaje datos = (Mensaje) in.readObject();
-            while(datos.getCodigo() == 1996 && nGrupo.equals(datos.getGrupo())) {
-              ClienteChat.addToGroupList(datos.getUsuario(), nGrupo);
-              datos = (Mensaje) in.readObject();
-            }
-            if (datos.getCodigo() != 1994 || !datos.getContenido().equals("end"))
-              System.err.println("Error: el servidor no ha terminado de mandar información como se esperaba");
-
-            Contactos.iniciaConversacionCon(nGrupo, true);
-            System.out.println("Te han metido en el grupo " + nGrupo + ".");
-          } catch(IOException e) {
-            System.err.println("Error durante la recepción de miembros de un grupo");
-          } catch(ClassNotFoundException e) {
-            System.err.println("Error durante la recepción de miembros de un grupo");
-          }
+          ClienteChat.addToGroupList(ClienteChat.getNombre(), nGrupo);
+          ClienteChat.askForMemberList(nGrupo);
+          Contactos.iniciaConversacionCon(nGrupo, true);
+          System.out.println("Te han metido en el grupo " + nGrupo + ".");
         }
         break;
       case 1997:
@@ -335,7 +322,7 @@ public class ClienteChat {
 
   // Determina si un grupo está en la lista de grupos pero sin miembros
   public static boolean groupIsReady(String grupo) {
-    return grupos.containsKey(grupo) && grupos.get(grupo) == null;
+    return isGroup(grupo) && grupos.get(grupo).isEmpty();
   }
 
   // Añade un usuario a la lista de miembros de un grupo
@@ -396,7 +383,7 @@ public class ClienteChat {
 
   // Determina si el cliente es miembro de un grupo
   public static boolean isMemberOfGroup(String grupo) {
-    return isGroup(grupo) && grupos.get(grupo) != null;
+    return isGroup(grupo) && !grupos.get(grupo).isEmpty();
   }
 
   // Determina si un usuario está en un grupo
