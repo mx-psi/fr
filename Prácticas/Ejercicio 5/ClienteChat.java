@@ -125,6 +125,7 @@ class Escuchador extends Thread {
       byte[] contenido = m.getRawContenido();
       bos.write(contenido, 0, contenido.length);
       bos.flush();
+      fos.close();
     } 
     catch (FileNotFoundException e){
       System.err.println("Fichero no encontrado en la recepción " + m.getRuta());
