@@ -75,8 +75,8 @@ class Escuchador extends Thread {
           try {
             ClienteChat.askForMemberList(nGrupo);
             Mensaje datos = (Mensaje) in.readObject();
-            while(datos.getCodigo() == 1996) {
-              ClienteChat.addToGroupList(datos.getContenido(), nGrupo);
+            while(datos.getCodigo() == 1996 && nGrupo.equals(datos.getGrupo())) {
+              ClienteChat.addToGroupList(datos.getUsuario(), nGrupo);
               datos = (Mensaje) in.readObject();
             }
             if (datos.getCodigo() != 1994 || !datos.getContenido().equals("end"))
@@ -414,7 +414,7 @@ public class ClienteChat {
         datos = (Mensaje) ois.readObject();
       }
       while(datos.getCodigo() == 1997) {
-        addToUserList(datos.getContenido());
+        addToUserList(datos.getUsuario());
         datos = (Mensaje) ois.readObject();
       }
       if (datos.getCodigo() != 1994 || !datos.getContenido().equals("end"))
@@ -424,8 +424,8 @@ public class ClienteChat {
       askForMemberList("Global");
       datos = (Mensaje) ois.readObject();
       TreeSet<String> global = grupos.get("Global");  // TODO: debería manejarse si falla
-      while(datos.getCodigo() == 1996) {
-        usuarios.add(datos.getContenido());
+      while(datos.getCodigo() == 1996 && "Global".equals(datos.getGrupo())) {
+        global.add(datos.getUsuario());
         datos = (Mensaje) ois.readObject();
       }
       if (datos.getCodigo() != 1994 || !datos.getContenido().equals("end"))

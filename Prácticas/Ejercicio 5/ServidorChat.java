@@ -117,9 +117,13 @@ public class ServidorChat {
     for (String g:grupos.keySet())
       usuario.sendMessage(new Mensaje(1995, g));
 
+    Mensaje m;
     for (String c:clientes.keySet())
-      if (!usuario.getClientName().equals(c))
-        usuario.sendMessage(new Mensaje(1997, c));
+      if (!usuario.getClientName().equals(c)) {
+        m = new Mensaje(1997, "");
+        m.setUsuario(c);
+        usuario.sendMessage(m);
+      }
   }
 
   // Envía la lista de los usuarios de un grupo a un usuario
