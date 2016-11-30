@@ -68,24 +68,46 @@ class Escuchador extends Thread {
           m = new Mensaje(0, nombre + " se ha incorporado al grupo");
           if (Contactos.hayConversacionCon(nGrupo))
             Contactos.addMensaje(nGrupo, m);
-          // TODO: añadir al usuario a la lista de miembros de nGrupo
+
+          ClienteChat.addToGroupList(nombre, nGrupo);
         } else {
-          Contactos.iniciaConversacionCon(nGrupo, true);
-          // TODO: ¿cómo avisar al usuario de que ha entrado al grupo?
+          // TODO: ¿debería comprobarse que el grupo está creado y vacío?
+          try {
+            ClienteChat.askForMemberList(nGrupo);
+            Mensaje datos = (Mensaje) in.readObject();
+            while(datos.getCodigo() == 1996) {
+              ClienteChat.addToGroupList(datos.getContenido(), nGrupo);
+              datos = (Mensaje) in.readObject();
+            }
+            if (datos.getCodigo() != 1994 || !datos.getContenido().equals("end"))
+              System.err.println("Error: el servidor no ha terminado de mandar información como se esperaba");
+
+            Contactos.iniciaConversacionCon(nGrupo, true);
+            System.out.println("Te han metido en el grupo " + nGrupo + ".");
+          } catch(IOException e) {
+            System.err.println("Error durante la recepción de miembros de un grupo");
+          } catch(ClassNotFoundException e) {
+            System.err.println("Error durante la recepción de miembros de un grupo");
+          }
         }
         break;
       case 1997:
       case 1998:
         nombre = m.getUsuario();
         if (Soy(nombre)) return;
-        esMensaje = !Contactos.convActualEsGrupo() /* || TODO: método que dé si el usuario estaba en el grupo */;
+        esMensaje = !Contactos.convActualEsGrupo() || ClienteChat.isInGroup(nombre, Contactos.getConvActual());
+        if (esMensaje) conv = Contactos.getConvActual();
         boolean conectado = m.getCodigo() == 1997;
         m = new Mensaje(0, nombre + " se ha " + (conectado ? "" : "des") + "conectado."); // Mensaje que se mostrará al cliente
         if (Contactos.hayConversacionCon(nombre))
           Contactos.addMensaje(conv, m);
-        // TODO: almacenar m en todos los grupos en común con el usuario
-        // TODO: si 1997, añadir al usuario a la lista de conectados
-        // TODO: si 1998, quitar usuario de la lista de conectados y de los grupos en los que estuviese
+
+        if (conectado)
+          ClienteChat.addToUserList(nombre);  // Se añade a la lista de usuarios
+        else {
+          Contactos.addMensajeToCommonGroups(m, nombre);
+          ClienteChat.removeFromAllUserLists(nombre);   // Se elimina de los grupos en común
+        }
         break;
       default: 
         System.err.println("Error: Tipo de mensaje no reconocido");
@@ -209,10 +231,17 @@ public class ClienteChat {
           programMessage("Ya estás conversando " + (Contactos.convActualEsGrupo() ? "en" : "con")
                             + " " + argumentos + ".\n");
         else {
-          // TODO: ¿debería fallar si el usuario o grupo objetivo no está conectado?
-          // TODO: ¿debería fallar si no está en el grupo?
+          boolean es_grupo = ClienteChat.isGroup(argumentos);
+          if (es_grupo) {
+            if (!ClienteChat.isMemberOfGroup(argumentos)) {
+              programMessage("No eres miembro del grupo " + argumentos + ".\n");
+              return true;
+            }
+          } else if (!ClienteChat.isUser(argumentos)) {
+            programMessage(argumentos + " no es un usuario ni un grupo.\n");
+            return true;
+          }
           // TODO: clear?
-          boolean es_grupo = false; // TODO
           programMessage("\nAhora estás hablando " + (es_grupo ? "en" : "con") + " " + argumentos + ".\n");
           Contactos.iniciaConversacionCon(argumentos, es_grupo);
           Contactos.mostrarMensajes();
@@ -222,14 +251,26 @@ public class ClienteChat {
       case "grupo":
       case "group":
       case "newgroup":
-        programMessage("TODO"); // TODO: comando para crear grupo
+        programMessage("TODO\n"); // TODO: comando para crear grupo
         return true;
       case "a":
       case "add":
       case "anadir":
-        programMessage("TODO"); // TODO: comando para añadir a alguien al grupo actual
+        programMessage("TODO\n"); // TODO: comando para añadir a alguien al grupo actual
         return true;
-      // TODO: comandos para ver la lista de conectados y la de miembros de un grupo en particular
+      case "u":
+      case "users":
+      case "usuarios":
+        printUserList();
+        return true;
+      case "m":
+      case "members":
+      case "miembros":
+        if (Contactos.convActualEsGrupo())
+          printMemberList(Contactos.getConvActual());
+        else
+          programMessage("Esta conversación no es un grupo.\n");
+        return true;
       case "h":
       case "?":
       case "help":
@@ -238,7 +279,9 @@ public class ClienteChat {
                      + "/a usuario: añadir a un usuario al grupo actual"
                      + "/c usuario/grupo: pasar a hablar con un usuario o grupo\n"
                      + "/g grupo: crear un grupo"
+                     + "/m: ver lista de miembros del grupo actual\n"
                      + "/s archivo: mandar un archivo\n"
+                     + "/u: ver lista de usuarios conectados\n"
                      + "/q: salir\n");  // TODO: añadir el resto de comandos
         return true;
       case "s":
@@ -250,6 +293,82 @@ public class ClienteChat {
         programMessage("Comando desconocido.\n");
         return true;
     }
+  }
+
+  // Añade un usuario a la lista de conectados
+  public static void addToUserList(String nombre) {
+    usuarios.add(nombre);
+  }
+
+  // Determina si un usuario está en la lista de conectados
+  public static boolean isUser(String usuario) {
+    return usuarios.contains(usuario);
+  }
+
+  // Añade un usuario a la lista de miembros de un grupo
+  public static void addToGroupList(String usuario, String grupo) {
+    if (isGroup(grupo))
+      grupos.get(grupo).add(usuario);
+  }
+
+  // Elimina un usuario de todas las listas (conectados y grupos)
+  public static void removeFromAllUserLists(String nombre) {
+    usuarios.remove(nombre);  // TODO: ¿debería hacerse? No tiene por qué ser deseable
+    for (TreeSet<String> t:grupos.values())
+      t.remove(nombre);
+  }
+
+  // Pide la lista de miembros de un grupo al servidor. Devuelve false si hubo un error
+  public static boolean askForMemberList(String grupo) {
+    try {
+      outStream.writeObject(new Mensaje(1996, grupo));
+    } catch(IOException e) {
+      error("Error al solicitar la lista de miembros del grupo " + grupo + " al servidor");
+      return false;
+    }
+    return true;
+  }
+
+  public static void printUserList() {
+    int nUsuarios = 0;
+    int nColumnas = 5;
+    String salida = "";
+    for (String u:usuarios)
+      if ((++nUsuarios)%nColumnas > 0)
+        salida += String.format("%-16s", u);
+      else
+        salida += u + "\n";
+    programMessage(salida + (nUsuarios%nColumnas > 0 ? "\n" : "") + "Total: " + nUsuarios + "\n");
+  }
+
+  public static void printMemberList(String grupo) {
+    if (!grupos.containsKey(grupo))
+      return;
+
+    int nUsuarios = 0;
+    int nColumnas = 5;
+    String salida = "";
+    for (String u:grupos.get(grupo))
+      if ((++nUsuarios)%nColumnas > 0)
+        salida += String.format("%-16s", u);
+      else
+        salida += u + "\n";
+    programMessage(salida + (nUsuarios%nColumnas > 0 ? "\n" : "") + "Total: " + nUsuarios + "\n");
+  }
+
+  // Determina si una conversación es un grupo
+  public static boolean isGroup(String grupo) {
+    return grupos.containsKey(grupo);
+  }
+
+  // Determina si el cliente es miembro de un grupo
+  public static boolean isMemberOfGroup(String grupo) {
+    return isGroup(grupo) && grupos.get(grupo) != null;
+  }
+
+  // Determina si un usuario está en un grupo
+  public static boolean isInGroup(String usuario, String grupo) {
+    return isGroup(grupo) && grupos.get(grupo).contains(usuario);
   }
 
 	public static void main(String[] args) {
@@ -295,14 +414,14 @@ public class ClienteChat {
         datos = (Mensaje) ois.readObject();
       }
       while(datos.getCodigo() == 1997) {
-        usuarios.add(datos.getContenido());
+        addToUserList(datos.getContenido());
         datos = (Mensaje) ois.readObject();
       }
       if (datos.getCodigo() != 1994 || !datos.getContenido().equals("end"))
         error("Error: el servidor no ha terminado de mandar información como se esperaba");
 
       // Obtiene la lista de usuarios del grupo Global
-      outStream.writeObject(new Mensaje(1996, "Global"));
+      askForMemberList("Global");
       datos = (Mensaje) ois.readObject();
       TreeSet<String> global = grupos.get("Global");  // TODO: debería manejarse si falla
       while(datos.getCodigo() == 1996) {

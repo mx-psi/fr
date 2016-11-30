@@ -29,6 +29,13 @@ public class Contactos {
     mensajes.get(conv).add(mensaje);
   }
 
+  // Añade un mensaje a todos los grupos en común con un usuario
+  public static void addMensajeToCommonGroups(Mensaje mensaje, String usuario) {
+    for (String conv:mensajes.keySet())
+      if (mensajes.get(conv).esGrupo() && ClienteChat.isInGroup(usuario, conv))
+        addMensaje(conv, mensaje);
+  }
+
   // Obtiene los mensajes de un contacto
   public static Conversacion getMensajes(String conv){
     return mensajes.get(conv);
