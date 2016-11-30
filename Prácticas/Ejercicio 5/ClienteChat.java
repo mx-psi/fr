@@ -66,6 +66,8 @@ class Escuchador extends Thread {
         esMensaje = true;
         leerFichero(m);
         break;
+      case 1994:
+        break;  // Ignorar
       case 1995:
         ClienteChat.addGroup(m.getGrupo());
         break;

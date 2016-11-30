@@ -39,7 +39,7 @@ En cualquier momento un usuario puede solicitar su desconexión. En este momento
 | 1003       | *user*, *group* | Solicita que se añada *user* a *group* |
 | 1004       | *user*, *nombrefichero*, *fichero* | Solicita el envío de *fichero* a *user* |
 | 1992       | *user*, *group* | Añade a *user* al grupo *group* |
-| 1993       | *group* | Solicita la creación del grupo *group |
+| 1993       | *group* | Solicita la creación del grupo *group* |
 | 1996       | *group* | Solicita la lista de usuarios del grupo *group* |
 | 1999       | bye | El cliente solicita su desconexión |
 
