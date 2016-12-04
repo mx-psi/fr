@@ -4,7 +4,7 @@ author: Pablo Baeyens \and José Manuel Muñoz
 header-includes:
   - \usepackage[spanish]{babel}
   - \selectlanguage{spanish}
-  - \newcommand{\HLS}{\textit{HTTP Live Streaming}}
+  - \newcommand{\HLS}{\textit{HTTP Live Streaming }}
 toc: true                  # Índice
 numbersections: true       # Numeración de secciones
 fontsize: 12pt              # Tamaño de fuente
@@ -32,7 +32,7 @@ Además, este protocolo nos permite utilizar HTTPS y por tanto encriptar el cont
 
 La arquitectura de un streaming o video bajo demanda transmitido utilizando el protocolo \HLS se compone de las siguientes partes:
 
-- En primer lugar un **codificador** de archivos multimedia convierte la(s) entrada(s) de audio o vídeo a los formatos aceptados. El estándar tal y como viene definido en el *Request for Comment* no se indica la necesidad de utilizar un formato concreto; en la práctica se utiliza MEPG-2 <!--TODO: Cuáles son/con qué características?-->
+- En primer lugar un **codificador** de archivos multimedia convierte la(s) entrada(s) de audio o vídeo a los formatos aceptados. El estándar tal y como viene definido en el *Request for Comment* no indica la necesidad de utilizar un formato concreto; en la práctica se utiliza MPEG-2 <!--TODO: Cuáles son/con qué características?-->
 - A continuación un **segmentador de flujo** divide la entrada de audio o vídeo en segmentos cortos (de unos 10 segundos de duración usualmente)
 - Para la distribución el servidor web genera un **archivo de índice** que incluye los segmentos mencionados anteriormente así como información sobre estos: su calidad, *bitrate* y otros metadatos que necesite el cliente para reproducir el contenido
 - Este archivo así como los segmentos se transmiten mediante un **servidor HTTP** usual, recargando el archivo índice cuando se generen nuevos segmentos
@@ -106,6 +106,23 @@ Aunque no es obligatorio, el estándar recomienda que el audio sea el mismo entr
 
 # Cómo se relaciona con el resto de elementos HTML
 ## El elemento `video`
+
 ## Utilización en dispositivos que no sean Apple
+
+\HLS tiene soporte por defecto en dispositivos Apple, en Safari y en las versiones para iOS y Android del navegador Google Chrome. Para el resto de dispositivos es necesario adaptar el protocolo para asegurar la reproducción utilizando Javascript.
+
+La biblioteca más común es `hls.js` desarrollada por Dailymotion. Esta librería convierte los segmentos de vídeo recibidos para utilizar MediaSource, una extensión de HTML5 que permite la transmisión de audio y vídeo. Las siguientes subsecciones describen brevemente el funcionamiento de esta librería.
+
+<!--
+TODO:
+- Cómo funciona MediaSource
+- Cómo funciona hls.js
+-->
+- [Media Source Extensions™](https://www.w3.org/TR/media-source/)
+- [Introducing hls.js](http://engineering.dailymotion.com/introducing-hls-js/)
+- [dailymotion/hls.js: MSE-based HLS client - http://dailymotion.github.io/hls.js/demo](https://github.com/dailymotion/hls.js)
+- [Adaptive Streaming with HLS in HTML5](https://www.jwplayer.com/blog/hls-in-html5/)
+- [MediaSource - Web API reference](https://developer.mozilla.org/es/docs/Web/API/MediaSource)
+
 
 \input{bibliografia}
