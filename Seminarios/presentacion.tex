@@ -1,0 +1,81 @@
+\documentclass[10pt,compress,usetitleprogressbar,mathserif]{beamer}
+\usepackage[spanish, es-tabla,es-noquoting,es-noshorthands]{babel}
+\usepackage{etex}
+\usepackage{tikz} % Tikz (para el tema)
+\usepackage{showexpl} % ???
+\usepackage{amsthm}  %%
+\usepackage{amsmath} % Matemáticas
+\usepackage{amssymb} %%
+\usepackage{graphicx} % Imágenes
+
+\usepackage{listings} % Códigos
+
+\definecolor{backg}{HTML}{F2F2F2}    % Fondo
+\definecolor{comments}{HTML}{BDBDBD} % Comentarios
+\definecolor{keywords}{HTML}{08388c} % Palabras clave
+\definecolor{strings}{HTML}{0489B1}  % Strings
+
+\lstset{
+%language=,
+basicstyle=\ttfamily\small,
+breaklines=true,
+backgroundcolor=\color{backg},
+keywordstyle=\color{keywords},
+commentstyle=\color{comments},
+stringstyle=\color{strings},
+tabsize=2,
+% Acentos, ñ, ¿, ¡ (tex.stackexchange.com/questions/24528)
+extendedchars=true,
+literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1
+         {ú}{{\'u}}1 {ñ}{{\~n}}1 {¡}{{\textexclamdown}}1
+}
+
+% Solarized palette
+\definecolor{solarizedBase03}{HTML}{002B36}
+\definecolor{solarizedBase02}{HTML}{073642}
+\definecolor{solarizedBase01}{HTML}{586e75}
+\definecolor{solarizedBase00}{HTML}{657b83}
+\definecolor{solarizedBase0}{HTML}{839496}
+\definecolor{solarizedBase1}{HTML}{93a1a1}
+\definecolor{solarizedBase2}{HTML}{EEE8D5}
+\definecolor{solarizedBase3}{HTML}{FDF6E3}
+\definecolor{solarizedYellow}{HTML}{B58900}
+\definecolor{solarizedOrange}{HTML}{CB4B16}
+\definecolor{solarizedRed}{HTML}{DC322F}
+\definecolor{solarizedMagenta}{HTML}{D33682}
+\definecolor{solarizedViolet}{HTML}{6C71C4}
+\definecolor{solarizedBlue}{HTML}{268BD2}
+\definecolor{solarizedCyan}{HTML}{2AA198}
+\definecolor{solarizedGreen}{HTML}{859900}
+
+\usetheme{epstfg}
+\setbeamertemplate{note page}[compress]
+\setbeamertemplate{itemize subitem}{\tiny\raise1.5pt\hbox{\donotcoloroutermaths$\blacktriangleright$}}
+\title{HTTP Live Streaming}
+\author{Pablo Baeyens \and José Manuel Muñoz}
+\date{Fundamentos de Redes}
+\def\inline{\lstinline[basicstyle=\ttfamily]}
+
+\begin{document}
+\maketitle
+
+\begin{frame}{Índice}
+  \tableofcontents
+\end{frame}
+
+\begin{frame}{¿Qué es HLS?}
+  HTTP Live Streaming es un protocolo de transmisión de \textbf{streaming} y \textbf{vídeo bajo demanda}.
+
+  Es soportado por dispositivos móviles con iOS y Android y ha sido utilizado por páginas como TED, Twitter %o Twitch?
+\end{frame}
+
+\begin{frame}{Características}
+  Sus principales características son:
+  \begin{itemize}
+    \item Se transmite mediante \textbf{HTTP} (no necesita configuración adicional)
+    \item Permite adaptar la calidad del vídeo según la conexión
+    \item Permite encriptar el vídeo y transmitir metadatos adicionales
+  \end{itemize}
+\end{frame}
+
+\end{document}
