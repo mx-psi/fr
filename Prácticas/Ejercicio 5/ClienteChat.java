@@ -63,6 +63,8 @@ class Escuchador extends Thread {
         Contactos.addMensaje(conv,m);
         break;
       case 1004:
+        nombre = m.getUsuario();
+        if (Soy(nombre)) return;
         esMensaje = true;
         leerFichero(m);
         break;
@@ -193,7 +195,6 @@ public class ClienteChat {
       FileInputStream fis = new FileInputStream(file);
       BufferedInputStream bis = new BufferedInputStream(fis);
       bis.read(rawFichero,0,rawFichero.length);
-      // TODO: Comprobar si es grupo
       outStream.writeObject(new Mensaje(Contactos.getConvActual(),rawFichero,file.getName()));
     }
     catch (FileNotFoundException e) {

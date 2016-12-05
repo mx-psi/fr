@@ -33,7 +33,7 @@ public class ServidorChat {
   }
 
   public static boolean nombreUsado(String nombre) {
-    return clientes.containsKey(nombre) || grupos.containsKey(nombre);
+    return esCliente(nombre) || esGrupo(nombre);
   }
 
   // Añade un cliente
@@ -58,6 +58,16 @@ public class ServidorChat {
     clientes.remove(name);
   }
 
+  // Comprueba si hay un usuario con un cierto nombre
+  public static boolean esCliente(String nombre) {
+    return clientes.containsKey(nombre);
+  }
+
+  // Comprueba si hay un grupo con un cierto nombre
+  public static boolean esGrupo(String nombre) {
+    return grupos.containsKey(nombre);
+  }
+
   // Añade un grupo y devuelve si ha sido posible
   public static boolean addGroup(String nombre, Cliente creador) {
     if (nombreUsado(nombre))
@@ -70,7 +80,7 @@ public class ServidorChat {
 
   // Disuelve un grupo vacío
   public static boolean removeGroup(String name) {
-    if (!grupos.containsKey(name) || grupos.get(name).esPermanente())
+    if (!esGrupo(name) || grupos.get(name).esPermanente())
       return false;
 
     grupos.remove(name);
@@ -79,7 +89,7 @@ public class ServidorChat {
 
   // Añade un cliente a un grupo
   public static boolean addClientToGroup(String grupo, String cliente, String solicitante) {
-    if (!grupos.containsKey(grupo))
+    if (!esGrupo(grupo))
       addGroup(grupo, clientes.get(solicitante));
 
     return grupos.get(grupo).addMember(clientes.get(cliente));
@@ -92,7 +102,7 @@ public class ServidorChat {
 
   // Envía un mensaje al cliente con nombre "destino"
   public static boolean sendToClient(String destino, Mensaje message) {
-    if (!clientes.containsKey(destino))
+    if (!esCliente(destino))
       return false;
 
     clientes.get(destino).sendMessage(message);
@@ -107,7 +117,7 @@ public class ServidorChat {
   
   // Envía un mensaje al grupo con nombre "nombregrupo"
   public static boolean sendToGroup(String nombregrupo, Mensaje message) {
-    if (!grupos.containsKey(nombregrupo))
+    if (!esGrupo(nombregrupo))
       return false;
 
     grupos.get(nombregrupo).sendMessage(message);
@@ -130,7 +140,7 @@ public class ServidorChat {
 
   // Envía la lista de los usuarios de un grupo a un usuario
   public static void sendGroupMembers(Cliente usuario, String nombregrupo) {
-    if (!grupos.containsKey(nombregrupo)) {
+    if (!esGrupo(nombregrupo)) {
       usuario.sendMessage(new Mensaje(2002, nombregrupo));
       return;
     }

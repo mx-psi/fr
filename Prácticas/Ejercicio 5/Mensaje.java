@@ -36,14 +36,12 @@ public class Mensaje implements java.io.Serializable {
   }
 
   // Envío de ficheros
-  // TODO: Cómo hacer la versión para grupos?
-  public Mensaje(String usuario, byte[] contenido, String ruta){
+  public Mensaje(String destinatario, byte[] contenido, String ruta){
     this.codigo = 1004;
-    this.usuario = usuario;
+    this.usuario = destinatario;
     this.date = new Date();
     this.ruta = ruta;
     this.contenido = contenido;
-    this.grupo = grupo;
     esDeChat = false;   // No interesa guardarlo
   }
 

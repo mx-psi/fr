@@ -123,8 +123,12 @@ public class Cliente extends Thread {
       case 1001:
       case 1004:
         mensaje.setUsuario(name);
-        if(!ServidorChat.sendToClient(destinatario, mensaje))
-          sendMessage(new Mensaje(2001,destinatario));
+        mensaje.setGrupo(destinatario);
+        if (!ServidorChat.sendToGroup(destinatario, mensaje)) {
+          mensaje.setGrupo(null);
+          if (!ServidorChat.sendToClient(destinatario, mensaje))
+            sendMessage(new Mensaje(2001,destinatario));
+        }
         break;
       case 1002:
         mensaje.setUsuario(name);
