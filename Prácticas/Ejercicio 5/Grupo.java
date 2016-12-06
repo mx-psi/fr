@@ -68,11 +68,10 @@ public class Grupo {
     return addMember(c, c);
   }
 
+  // Elimina del grupo a un cliente que se haya desconectado
   public boolean removeMember(Cliente a_borrar) {
     if (!clientes.remove(a_borrar))
       return false; // No estaba
-
-    // TODO: mandar mensaje TCP conveniente a los clientes del grupo y al expulsado
 
     if (!permanente && isEmpty())
       ServidorChat.removeGroup(groupName);

@@ -1,6 +1,6 @@
 import java.io.IOException;
 import java.util.IllegalFormatException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.net.ServerSocket;
 
 
@@ -10,8 +10,8 @@ import java.net.ServerSocket;
 public class ServidorChat {
   private static int port = 8989; // Puerto por defecto
   private static ServerSocket socketServidor;
-  private static HashMap<String, Cliente> clientes;
-  private static HashMap<String, Grupo> grupos;
+  private static LinkedHashMap<String, Cliente> clientes;
+  private static LinkedHashMap<String, Grupo> grupos;
   private static final int maxExpectedClients = 32768;
   private static final int maxExpectedGroups = 64;
   public static final int MAX_NAME_LENGTH = 15;
@@ -54,8 +54,9 @@ public class ServidorChat {
   }
 
   // Elimina un cliente ya desconectado a partir de su nombre
-  public static void removeClient(String name) {
-    clientes.remove(name);
+  public static void removeClient(Cliente cl) {
+    for (Grupo g:grupos.values()) g.removeMember(cl);
+    clientes.remove(cl.getClientName());
   }
 
   // Comprueba si hay un usuario con un cierto nombre
@@ -153,8 +154,8 @@ public class ServidorChat {
     if (args.length >= 1)
       port = Integer.parseInt(args[0]);
 
-    clientes = new HashMap<String,Cliente>(2*maxExpectedClients, (float) 1/2);
-    grupos   = new HashMap<String,Grupo>  (2*maxExpectedGroups , (float) 1/2);
+    clientes = new LinkedHashMap<String,Cliente>(2*maxExpectedClients, (float) 1/2);
+    grupos   = new LinkedHashMap<String,Grupo>  (2*maxExpectedGroups , (float) 1/2);
     addGroup("Global", null);   // Crea un grupo para todos los usuarios conectados
     if (initializeServerSocket()) {
       System.out.println("Esperando conexiones a través del puerto " + port + "...");

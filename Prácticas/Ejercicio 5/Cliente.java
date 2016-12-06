@@ -110,7 +110,7 @@ public class Cliente extends Thread {
 
   private void disconnect() {
 		System.out.println("El cliente " + name + " se ha desconectado");
-    ServidorChat.removeClient(name);
+    ServidorChat.removeClient(this);
     Mensaje m = new Mensaje(1998, "");
     m.setUsuario(name);
     ServidorChat.sendToAllClients(m);
