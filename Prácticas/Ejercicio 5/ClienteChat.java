@@ -87,7 +87,7 @@ class Escuchador extends Thread {
           ClienteChat.addToGroupList(ClienteChat.getNombre(), nGrupo);
           ClienteChat.askForMemberList(nGrupo);
           Contactos.iniciaConversacionCon(nGrupo, true);
-          System.out.println("Te han metido en el grupo " + nGrupo + ".");
+          System.out.println("Te han metido en el grupo " + nGrupo + ". Usa /c " + nGrupo + " para entrar.");
         }
         break;
       case 1997:
@@ -263,7 +263,7 @@ public class ClienteChat {
           programMessage("Esta conversación no es un grupo");
           return true;
         }
-        Mensaje mag = new Mensaje(1992, "");
+        Mensaje mag = new Mensaje(1003, "");
         mag.setUsuario(argumentos);
         mag.setGrupo(Contactos.getConvActual());
         try {

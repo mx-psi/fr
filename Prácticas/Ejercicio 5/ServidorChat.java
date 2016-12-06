@@ -92,7 +92,11 @@ public class ServidorChat {
     if (!esGrupo(grupo))
       addGroup(grupo, clientes.get(solicitante));
 
-    return grupos.get(grupo).addMember(clientes.get(cliente));
+    return grupos.get(grupo).addMember(clientes.get(cliente), clientes.get(solicitante));
+  }
+
+  public static boolean addClientToGroup(String grupo, String cliente) {
+    return addClientToGroup(grupo, cliente, cliente);
   }
 
   // Añade un cliente al grupo global

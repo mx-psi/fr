@@ -1,17 +1,17 @@
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 
 /*
   Gestiona la información y envío de mensajes en un grupo
 */
 public class Grupo {
   private String groupName;
-  private ArrayList<Cliente> clientes;
+  private LinkedHashSet<Cliente> clientes;
   private static final int maxClientes = 512;
   private boolean permanente;
 
 	public Grupo(String name, Cliente creador) {
     groupName = name;
-		clientes = new ArrayList<Cliente>();
+		clientes = new LinkedHashSet<Cliente>();
     permanente = creador == null;
     ServidorChat.sendToAllClients(new Mensaje(1995, "").setGrupo(name));
     if (!permanente)
@@ -52,12 +52,11 @@ public class Grupo {
       return false;
     }
 
-    if (clientes.contains(nuevo)) {
-      solicitante.sendMessage(new Mensaje(2005, getName() + ";" + nuevo.getClientName()));  // TODO
+    if (!clientes.add(nuevo)) {
+      solicitante.sendMessage(new Mensaje(2005, "").setUsuario(nuevo.getClientName()).setGrupo(getName()));
       return false;
     }
 
-    clientes.add(nuevo);
     Mensaje m = new Mensaje(1996, "");
     m.setUsuario(nuevo.getClientName());
     m.setGrupo(groupName);
