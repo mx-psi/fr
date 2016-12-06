@@ -10,6 +10,7 @@ import java.net.UnknownHostException;
 
 import java.util.Scanner;
 import java.util.Date;
+import java.util.ArrayList;
 import java.util.TreeSet;
 import java.util.TreeMap;
 import java.util.NoSuchElementException;
@@ -60,6 +61,10 @@ class Escuchador extends Thread {
       case 1001:
       case 1002:
         esMensaje = true;
+        if (m.getCodigo() == 1001 && !Contactos.hayConversacionCon(conv)) {
+          System.out.println(conv + " ha empezado a hablar contigo");
+          Contactos.iniciaConversacionCon(conv, false);
+        }
         Contactos.addMensaje(conv,m);
         break;
       case 1004:
@@ -246,6 +251,19 @@ public class ClienteChat {
           Contactos.mostrarMensajes();
         }
         return true;
+      case "l":
+      case "list":
+      case "lista":
+        programMessage("Lista de conversaciones en las que participas:\n");
+        StringBuilder b = new StringBuilder();
+        ArrayList<String> conversaciones = Contactos.getConversaciones();
+        for (String s:conversaciones) {
+          b.append("\n");
+          b.append(s);
+        }
+        b.append("\n");
+        programMessage(b.toString());
+        return true;
       case "g":
       case "grupo":
       case "group":
@@ -291,10 +309,11 @@ public class ClienteChat {
                      + "/a usuario: añadir a un usuario al grupo actual\n"
                      + "/c usuario/grupo: pasar a hablar con un usuario o grupo\n"
                      + "/g grupo: crear un grupo\n"
+                     + "/l: ver lista de conversaciones en las que participas\n"
                      + "/m: ver lista de miembros del grupo actual\n"
                      + "/s archivo: mandar un archivo\n"
                      + "/u: ver lista de usuarios conectados\n"
-                     + "/q: salir\n");  // TODO: añadir el resto de comandos
+                     + "/q: salir\n");
         return true;
       case "s":
       case "send":
