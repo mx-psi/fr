@@ -41,12 +41,8 @@ public class Grupo {
 
   // Envía la lista de miembros del grupo
   public void sendMembers(Cliente usuario) {
-    Mensaje m = new Mensaje(1996, "");
-    m.setGrupo(groupName);
-    for (Cliente c:clientes) {
-      m.setUsuario(c.getClientName());
-      usuario.sendMessage(m);
-    }
+    for (Cliente c:clientes)
+      usuario.sendMessage(new Mensaje(1996, "").setGrupo(groupName).setUsuario(c.getClientName()));
   }
 
   // Devuelve true en caso de éxito, false si ya estaba
