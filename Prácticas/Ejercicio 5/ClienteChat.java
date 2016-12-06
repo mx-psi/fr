@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.EOFException;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 
@@ -135,7 +136,7 @@ class Escuchador extends Thread {
       System.err.println("Fichero no encontrado en la recepción " + m.getRuta());
     }
     catch (IOException e){
-      System.err.println("Error al intentar recibir el fichero " + m.getRuta());
+      System.err.println("Error al intentar recibir el fichero " + m.getRuta() + ": " + e.toString());
     }
   }
 
@@ -146,11 +147,12 @@ class Escuchador extends Thread {
         parse(m);
       }
     }
+    catch (EOFException e) {}   // Esta excepción se lanza al cerrar la conexión
     catch (IOException e) {
-      System.err.println("Error de entrada.");
+      System.err.println("Error de entrada: " + e.toString());
     }
     catch(ClassNotFoundException e){
-      System.err.println("Clase no encontrada");
+      System.err.println("Clase no encontrada: " + e.toString());
     }
   }
 }
@@ -206,7 +208,7 @@ public class ClienteChat {
       error("Fichero no encontrado: " + ruta);
     }
     catch (IOException e) {
-      error("Error al intentar mandar el fichero " + ruta);
+      error("Error al intentar mandar el fichero " + ruta + ": " + e.toString());
     }
   }
 
@@ -480,10 +482,10 @@ public class ClienteChat {
 			error("Error: Nombre de host no encontrado");
       return;
 		} catch (IOException e) {
-			error("Error de entrada/salida al abrir el socket");
+			error("Error de entrada/salida al abrir el socket: " + e.toString());
       return;
 		} catch(ClassNotFoundException e){
-      error("Clase no encontrada");
+      error("Clase no encontrada" + e.toString());
     }
 
     String mensaje;
@@ -505,7 +507,7 @@ public class ClienteChat {
 
       outStream.writeObject(new Mensaje(1999,"bye"));
     } catch (IOException e) {
-			error("Error durante el envío");
+			error("Error durante el envío" + e.toString());
 		} catch(NoSuchElementException e) {}
 	}
 }

@@ -20,7 +20,7 @@ public class ServidorChat {
     try {
       socketServidor = new ServerSocket(port);
     } catch(IOException e) {
-			System.err.println("Error al escuchar en el puerto " + port);
+			System.err.println("Error al escuchar en el puerto " + port + ": " + e.toString());
       return false;
     }
     return true;
@@ -45,11 +45,11 @@ public class ServidorChat {
       clientes.put(nombre, nuevo);
       nuevo.start();
     } catch(IOException e) {
-      System.out.println("Error: no se pudo aceptar la conexión solicitada (nombre = " + nombre + ")");
+      System.out.println("Error: no se pudo aceptar la conexión solicitada (nombre = " + nombre + "): " + e.toString());
     } catch(IllegalNameException e) {
       System.out.println("Error: solicitud de nombre inválida (" + e.what() + ")");
     } catch(ClassNotFoundException e) {
-      System.out.println("Error: no se pudo aceptar la conexión (nombre = " + nombre + ")");
+      System.out.println("Error: no se pudo aceptar la conexión (nombre = " + nombre + "): " + e.toString());
     }
   }
 

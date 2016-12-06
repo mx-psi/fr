@@ -85,7 +85,7 @@ public class Cliente extends Thread {
     try {
       outStream.writeObject(mensaje);
    	} catch(IOException e) {
-   	  System.err.println("Error en el envío al cliente " + name);
+   	  System.err.println("Error en el envío al cliente " + name + ": " + e.toString());
    	}
   }
   
@@ -102,9 +102,9 @@ public class Cliente extends Thread {
             mensaje = null;
       } while(mensaje != null);
    	} catch (IOException e) {
-			System.err.println("Error en la recepción del cliente (name = " + name + ")");
+			System.err.println("Error en la recepción del cliente (name = " + name + ")" + e.toString());
 		} catch (ClassNotFoundException e) {
-			System.err.println("Error en la recepción del cliente (name = " + name + ")");
+			System.err.println("Error en la recepción del cliente (name = " + name + ")" + e.toString());
 		}
   }
 
