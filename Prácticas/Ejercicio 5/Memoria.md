@@ -71,9 +71,10 @@ En cualquier momento un usuario puede solicitar su desconexión. En este momento
 
 En primer lugar los usuarios deben conectarse al servicio, proporcionando la dirección del servidor, un nombre de usuario válido y su contraseña. A continuación pueden utilizar los siguientes comandos para navegar:
 
-- `/close`, `/exit`, `/quit`, `/q`, `/salir`: Cierra la conexión
-- `conversacion`, `c`: Cambia la conversación a la indicada
-- `usuarios`, `u`: Muestra los usuarios conectados
+- `/salir`, `/quit`, `/q`: Cierra la conexión
+- `/conversacion`, `/c`: Cambia la conversación a la indicada
+- `/lista`, `/l`: Muestra la lista de conversaciones
+- `/usuarios`, `/u`: Muestra los usuarios conectados
 
 La conexión se muestra así:
 
@@ -83,9 +84,9 @@ La conexión se muestra así:
 
 El sistema permite la creación de grupos. Los comandos adecuados son:
 
-- `grupo`, `g`: Crea un grupo
-- `anadir`, `a`: Añade un usuario a un grupo
-- `miembros`, `m`: Muestra los usuarios del grupo actual
+- `/grupo`, `/g`: Crea un grupo
+- `/anadir`, `/a`: Añade un usuario a un grupo
+- `/miembros`, `/m`: Muestra los usuarios del grupo actual
 
 Los grupos se muestran así:
 

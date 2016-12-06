@@ -1,21 +1,22 @@
 import java.util.HashMap;
+import java.util.ArrayList;
 
 /*
   Lista de contactos y grupos con mensajes
 */
 public class Contactos {
-  private static HashMap<String,Conversacion> mensajes = new HashMap<String,Conversacion>();
+  private static HashMap<String,Conversacion> conversaciones = new HashMap<String,Conversacion>();
   private static String convActual;
 
   // Determina si se ha recibido un mensaje de una conversación o se ha abierto
   public static boolean hayConversacionCon(String conv) {
-    return mensajes.containsKey(conv);
+    return conversaciones.containsKey(conv);
   }
 
   // Marca una conversación como iniciada. Devuelve false si ya estaba iniciada
   public static boolean iniciaConversacionCon(String conv, boolean es_grupo) {
     if (!hayConversacionCon(conv)) {
-      mensajes.put(conv, new Conversacion(es_grupo));
+      conversaciones.put(conv, new Conversacion(es_grupo));
       return true;
     }
     return false;
@@ -24,21 +25,21 @@ public class Contactos {
   // Añade un mensaje a la lista de un contacto
   public synchronized static void addMensaje(String conv, Mensaje mensaje){
     if (!hayConversacionCon(conv))
-      mensajes.put(conv, new Conversacion(mensaje.esDeGrupo()));
+      conversaciones.put(conv, new Conversacion(mensaje.esDeGrupo()));
 
-    mensajes.get(conv).add(mensaje);
+    conversaciones.get(conv).add(mensaje);
   }
 
   // Añade un mensaje a todos los grupos en común con un usuario
   public static void addMensajeToCommonGroups(Mensaje mensaje, String usuario) {
-    for (String conv:mensajes.keySet())
-      if (mensajes.get(conv).esGrupo() && ClienteChat.isInGroup(usuario, conv))
+    for (String conv:conversaciones.keySet())
+      if (conversaciones.get(conv).esGrupo() && ClienteChat.isInGroup(usuario, conv))
         addMensaje(conv, mensaje);
   }
 
   // Obtiene los mensajes de un contacto
   public static Conversacion getMensajes(String conv){
-    return mensajes.get(conv);
+    return conversaciones.get(conv);
   }
 
   // Obtiene los mensajes de la conversación actual
@@ -61,6 +62,10 @@ public class Contactos {
 
   public static boolean convActualEsGrupo() {
     return getMensajes() != null && getMensajes().esGrupo();
+  }
+
+  public static ArrayList<String> getConversaciones() {
+    return new ArrayList<String>(conversaciones.keySet());
   }
 
   // Devuelve 1 en caso de éxito, 0 si no ha cambiado la conversación
