@@ -54,16 +54,9 @@ public class Cliente extends Thread {
 
   // Hebra que se encarga de recibir datos de este cliente
   public void run() {
-    if (getLoginInfo()) {
-      login();
-      listen();
-    }
+    login();
+    listen();
     disconnect();
-  }
-
-  // Recibe datos del cliente
-  private boolean getLoginInfo() {
-    return true;  // TODO
   }
 
   // Se llama tras un acceso correcto
