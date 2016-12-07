@@ -233,11 +233,17 @@ public class ClienteChat {
         return false;
       case "conversacion":
       case "c":
-        if (!Contactos.setConvActual(argumentos))
-          programMessage("Ya estás conversando " + (Contactos.convActualEsGrupo() ? "en" : "con")
-                            + " " + argumentos + ".\n");
-        else {
-          boolean es_grupo = ClienteChat.isGroup(argumentos);
+        boolean es_grupo;
+        if (Contactos.hayConversacionCon(argumentos)) {
+          if (!Contactos.setConvActual(argumentos)) {
+            programMessage("Ya estás conversando " + (Contactos.convActualEsGrupo() ? "en" : "con")
+                              + " " + argumentos + ".\n");
+            return true;
+          }
+          
+          es_grupo = Contactos.convActualEsGrupo();
+        } else {
+          es_grupo = ClienteChat.isGroup(argumentos);
           if (es_grupo) {
             if (!ClienteChat.isMemberOfGroup(argumentos)) {
               programMessage("No eres miembro del grupo " + argumentos + ".\n");
@@ -247,11 +253,11 @@ public class ClienteChat {
             programMessage(argumentos + " no es un usuario ni un grupo.\n");
             return true;
           }
-          // TODO: clear?
-          programMessage("\nAhora estás hablando " + (es_grupo ? "en" : "con") + " " + argumentos + ".\n");
-          Contactos.iniciaConversacionCon(argumentos, es_grupo);
-          Contactos.mostrarMensajes();
+          Contactos.setConvActual(argumentos);
         }
+        programMessage("\nAhora estás hablando " + (es_grupo ? "en" : "con") + " " + argumentos + ".\n");
+        Contactos.iniciaConversacionCon(argumentos, es_grupo);
+        Contactos.mostrarMensajes();
         return true;
       case "l":
       case "list":
@@ -357,7 +363,7 @@ public class ClienteChat {
 
   // Elimina un usuario de todas las listas (conectados y grupos)
   public static void removeFromAllUserLists(String nombre) {
-    usuarios.remove(nombre);  // TODO: ¿debería hacerse? No tiene por qué ser deseable
+    usuarios.remove(nombre);
     for (TreeSet<String> t:grupos.values())
       t.remove(nombre);
   }
@@ -467,7 +473,11 @@ public class ClienteChat {
       // Obtiene la lista de usuarios del grupo Global
       askForMemberList("Global");
       datos = (Mensaje) ois.readObject();
-      TreeSet<String> global = grupos.get("Global");  // TODO: debería manejarse si falla
+      TreeSet<String> global = grupos.get("Global");
+      if (global == null) {
+        error("Error inesperado: no existe el grupo Global");
+        return;
+      }
       while(datos.getCodigo() == 1996 && "Global".equals(datos.getGrupo())) {
         global.add(datos.getUsuario());
         datos = (Mensaje) ois.readObject();
