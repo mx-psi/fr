@@ -22,13 +22,15 @@ HLS (del inglés *HTTP Live Streaming*) es un protocolo de transmisión de conte
 
 Además, este protocolo nos permite utilizar HTTPS y por tanto encriptar el contenido que se retransmite. Es un protocolo desarrollado por Apple.
 
-<!--
-- Qué dispositivos lo soportan y cómo
-- Qué empresas lo utilizan
-- Cómo se le da soporte en dispositivos y software no Apple
--->
-
 ## Dispositivos que pueden utilizarlo
+
+Al ser \HLS un protocolo diseñado por Apple los dispositivos de la misma (aquellos con iOS en una versión superior a iOS 3.0 y Apple TV) soportan por defecto este protocolo, así como su navegador Safari. Además, algunos dispositivos con Android soportan también este protocolo.
+
+Sin embargo, los navegadores web más utilizados como Chrome, Firefox u Opera no soportan este protocolo de forma nativa, por lo que deben transformarse los segmentos descargados, usualmente utilizando JavaScript. Este procedimiento se describe en la sección *Utilización en dispositivos que no sean Apple*.
+
+Otro software que permiten la reproducción de vídeo o streaming en este formato son iTunes desde su versión 10.1 y VLC desde su versión 2. Una lista no exhaustiva de productos que permiten parcial o totalmente la reproducción de vídeo transmitido mediante \HLS puede consultarse [aquí](https://en.wikipedia.org/wiki/HTTP_Live_Streaming#Clients).
+
+\newpage
 
 ## Visión general de la arquitectura
 
@@ -36,11 +38,11 @@ Además, este protocolo nos permite utilizar HTTPS y por tanto encriptar el cont
 
 La arquitectura de un streaming o vídeo bajo demanda transmitido utilizando el protocolo \HLS se compone de las siguientes partes:
 
-- En primer lugar un **codificador** de archivos multimedia convierte la(s) entrada(s) de audio o vídeo a los formatos aceptados. El estándar tal y como viene definido en el *Request for Comment* no indica la necesidad de utilizar un formato concreto; en la práctica se utiliza MPEG-2 <!--TODO: Cuáles son/con qué características?-->
+- En primer lugar un **codificador** de archivos multimedia convierte la(s) entrada(s) de audio o vídeo a los formatos aceptados. El estándar tal y como viene definido en el *Request for Comment* no indica la necesidad de utilizar un formato concreto; en la práctica se utiliza MPEG-2.<!--TODO: Cuáles son/con qué características?-->
 - A continuación un **segmentador de flujo** divide la entrada de audio o vídeo en segmentos cortos (de unos 10 segundos de duración usualmente)
-- Para la distribución el servidor web genera un **archivo de índice** que incluye los segmentos mencionados anteriormente así como información sobre estos: su calidad, *bitrate* y otros metadatos que necesite el cliente para reproducir el contenido
+- Para la distribución el servidor web genera un **archivo de índice** que incluye los segmentos mencionados anteriormente así como información sobre estos: su calidad, *bitrate* y otros metadatos que necesite el cliente para reproducir el contenido.
 - Este archivo así como los segmentos se transmiten mediante un **servidor HTTP** usual, recargando el archivo índice cuando se generen nuevos segmentos
-- El cliente **reconstruye el vídeo** a partir de los segmentos descargados de tal forma que la reproducción sea fluida
+- El cliente **reconstruye el vídeo** a partir de los segmentos descargados de tal forma que la reproducción sea fluida.
 
 Este esquema general puede complicarse utilizando otras características del protocolo como la transmisión de vídeo en distintos formatos o calidades para conexiones más lentas o como respaldo, el añadido de subtítulos o metadatos adicionales y la encriptación del contenido enviado.
 
