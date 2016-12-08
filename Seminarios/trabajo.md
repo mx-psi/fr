@@ -62,6 +62,20 @@ Los archivos índice sólo pueden tener líneas en blanco, URIs (usualmente URLs
 
 La estructura de todo archivo índice debe ser:
 
+ - `#EXTM3U`: la primera línea debe ser la etiqueta que determina que el formato es `m3u8`.
+ - Un subconjunto de la siguiente lista de etiquetas:
+   - `EXT-X-PLAYLIST-TYPE:tipo`, donde `tipo` es `VOD` (Vídeo bajo demanda, en cuyo caso el índice no debe cambiar) o `EVENT` (usado en retransmisiones que permitan al usuario volver atrás, en cuyo caso el índice solo puede ser cambiado añadiendo fragmentos al final del mismo). Para una retransmisión en vivo que no garantice el almacenamiento de segmentos antiguos, puede no usarse esta etiqueta.
+   - `EXT-X-VERSION:N`, con `N` la versión del protocolo usada. Esta etiqueta permite retrocompatibilidad. Si no se usa, se supondrá que se usa la primera versión del protocolo.
+   - `EXT-X-TARGETDURATION:N`, siendo `N` la máxima duración que puede tener un segmento.
+   - `EXT-X-MEDIA-SEQUENCE:N`, con `N` el número de secuencia que se corresponde con el primer segmento. Puede no ser `0` si se trata de una retransmisión en vivo que no almacena los segmentos antiguos, en cuyo caso cada vez que se elimine el primer segmento este número debe incrementarse en 1.
+ - Una lista con un elemento de la siguiente forma para cada segmento:
+   - `#EXTINF:N`, siendo `N` un número en punto flotante que indica la duración del segmento. Típicamente es `10.0` para todos los segmentos salvo el último.
+   - Una URL que apunte al segmento. Puede ser relativa o absoluta.
+
+   Si dos de estos elementos usan segmentos con distinta codificación, puede informarse de ello al cliente mediante una línea la etiqueta `#EXT-X-DISCONTINUITY` entre ambos.
+ - Opcionalmente puede terminar por la etiqueta `#EXT-X-ENDLIST`. La presencia de esta etiqueta indica que no se añadirán más fragmentos al índice.
+
+<!--TODO: ¿añadir resto de tags? (referencias a otras playlists, encriptación, alternate media, byte range)-->
 <!--TODO: Añadir ejemplo y explicarlo-->
 https://developer.apple.com/library/content/technotes/tn2288/_index.html
 
