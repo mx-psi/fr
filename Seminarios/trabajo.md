@@ -87,9 +87,30 @@ La estructura de todo archivo índice debe ser:
    Si dos de estos elementos usan segmentos con distinta codificación, puede informarse de ello al cliente mediante una línea la etiqueta `#EXT-X-DISCONTINUITY` entre ambos.
  - Opcionalmente puede terminar por la etiqueta `#EXT-X-ENDLIST`. La presencia de esta etiqueta indica que no se añadirán más fragmentos al índice.
 
-<!--TODO: ¿añadir resto de tags? (referencias a otras playlists, encriptación, alternate media, byte range)-->
-<!--TODO: Añadir ejemplo y explicarlo-->
-https://developer.apple.com/library/content/technotes/tn2288/_index.html
+Un ejemplo de un archivo índice para un vídeo bajo demanda con 4 segmentos de 10 segundos de duración es:
+
+\vspace*{1cm}
+
+```
+#EXTM3U
+#EXT-X-PLAYLIST-TYPE:VOD
+#EXT-X-TARGETDURATION:10
+#EXT-X-VERSION:3
+#EXT-X-MEDIA-SEQUENCE:0
+#EXTINF:10.0,
+http://example.com/movie1/fileSequenceA.ts
+#EXTINF:10.0,
+http://example.com/movie1/fileSequenceB.ts
+#EXTINF:10.0,
+http://example.com/movie1/fileSequenceC.ts
+#EXTINF:9.0,
+http://example.com/movie1/fileSequenceD.ts
+#EXT-X-ENDLIST
+```
+
+\vspace*{1cm}
+
+Si las rutas estuvieran expresadas de forma relativa (tal y como recomienda el estándar) deberían indicarse simplemente el nombre de cada fichero `.ts`.
 
 ### Archivo índice maestro
 
@@ -129,6 +150,30 @@ La primera línea identifica el archivo como un archivo índice. A continuación
 Aunque no es obligatorio, el estándar recomienda que el audio sea el mismo entre los distintos flujos aunque la calidad de la imagen varíe. Esto permite la transición entre estos sin *glitches* auditivos.
 
 ### Archivos índice durante la retransmisión en directo
+
+Durante la retransmisión de un *streaming* se utiliza una única lista de reproducción que se va actualizando. Un ejemplo de un archivo índice en un cierto momento del *streaming* es:
+
+\vspace*{1cm}
+
+```
+#EXTM3U
+#EXT-X-TARGETDURATION:10
+#EXT-X-VERSION:3
+#EXT-X-MEDIA-SEQUENCE:2
+#EXTINF:10,
+fileSequence2.ts
+#EXTINF:10,
+fileSequence3.ts
+#EXTINF:10,
+fileSequence4.ts
+#EXTINF:10,
+fileSequence5.ts
+#EXTINF:10,
+fileSequence6.ts
+```
+\vspace*{1cm}
+
+Como podemos ver `EXT-X-MEDIA-SEQUENCE` indica que el primer segmento disponible es el tercero ya que el *streaming* ha avanzado. Además observamos que no existe la etiqueta `EXT-X-ENDLIST` para indicar que esta lista se actualizará conforme avance el *streaming*. No se indica la etiqueta `EXT-X-PLAYLIST-TYPE` por lo que se asume *streaming*.
 
 ## Configuración del servidor y transmisión
 ## Tipos de sesión
