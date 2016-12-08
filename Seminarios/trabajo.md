@@ -11,6 +11,8 @@ fontsize: 12pt              # Tamaño de fuente
 geometry: margin=1.5in        # Tamaño de los márgenes
 ---
 
+\newpage
+
 # Qué es HLS
 
 HLS (del inglés *HTTP Live Streaming*) es un protocolo de transmisión de contenido multimedia para streaming y vídeo bajo demanda (*VOD*). Sus principales características como protocolo de transmisión de vídeo son:
@@ -29,6 +31,8 @@ Además, este protocolo nos permite utilizar HTTPS y por tanto encriptar el cont
 ## Dispositivos que pueden utilizarlo
 
 ## Visión general de la arquitectura
+
+![Diagrama que muestra la arquitectura necesaria para la creación y transmisión de vídeo mediante HTTP Live Streaming. De Apple](img/visionGeneral.png)
 
 La arquitectura de un streaming o vídeo bajo demanda transmitido utilizando el protocolo \HLS se compone de las siguientes partes:
 
@@ -49,6 +53,8 @@ En esta sección explicamos el funcionamiento de las distintas partes del protoc
 El vídeo se codifica en un formato que pueda ser reproducido por los posibles clientes y se segmenta en archivos `ts` junto con un archivo de índice `m3u8`. Esto puede efectuarse de una sola vez sobre un archivo de vídeo o audio preparado, o sobre la marcha en caso de una retransmisión en directo, en cuyo caso cada vez que un segmento es completado se actualiza el índice. El cliente podrá usar reconstruir el archivo o el flujo a partir de los segmentos.
 
 El protocolo soporta posibles discontinuidades en las propiedades del contenido multimedia, como la codificación o las dimensiones. En estos casos se termina un segmento en la discontinuidad y en el índice se indica que el siguiente segmento, que comienza tras la discontinuidad, tiene una configuración distinta.
+
+![Diagrama que muestra el cambio a través del tiempo entre segmentos de distintas calidades en función de la calidad de la conexión. Fallback sólo tiene audio con una imagen estática. De encoding.com](img/timestamp.png)
 
 ## Archivos de índice
 
@@ -85,6 +91,8 @@ https://developer.apple.com/library/content/technotes/tn2288/_index.html
 
 ### Archivo índice maestro
 
+![Diagrama mostrando la estructura de un vídeo con un archivo índice maestro y 3 archivos índices con calidad para red móvil, wifi y Apple TV. De Apple](img/indiceMaestro.png)
+
 Para crear estructuras más complejas puede utilizarse una **lista de reproducción maestra**. Este archivo índice maestro (guardado también en `.m3u8`) proporciona una lista de flujos que los clientes pueden utilizar en función de sus preferencias. Algunas de las características posibles especificadas por el estándar e implementadas en el software de Apple son:
 
 - Proporcionar vídeo en distintas resoluciones, *bit rates* y formatos
@@ -96,6 +104,8 @@ El cliente es responsable de cambiar entre estos flujos en función de sus prefe
 Los flujos de respaldo se utilizan en el caso de que alguno de los flujos dé un fallo 404 o cualquier otro error. En caso de error el cliente escoge el siguiente flujo con más ancho de banda, escogiendo el que se encuentre antes en la lista si hay empate.
 
 Un ejemplo de un archivo índice maestro con dos flujos con distinta calidad y flujos de respaldo (extraído de la documentación de Apple) es:
+
+\vspace*{1cm}
 
 ```
 #EXTM3U
@@ -110,11 +120,13 @@ http://ALPHA.mycompany.com/md/prog_index.m3u8
 http://BETA.mycompany.com/md/prog_index.m3u8
 ```
 
+\vspace*{1cm}
+
 La primera línea identifica el archivo como un archivo índice. A continuación se listan las URLs de los archivos índice de los distintos flujos. Los primeros flujos indican una resolución baja mientras que los segundos tienen una resolución 1080p. El servidor `BETA` sirve de respaldo al servidor `ALPHA`. El estándar no limita el posible número de flujos de respaldo.
 
 Aunque no es obligatorio, el estándar recomienda que el audio sea el mismo entre los distintos flujos aunque la calidad de la imagen varíe. Esto permite la transición entre estos sin *glitches* auditivos.
 
-### Archivos índice durante la restransmisión en directo
+### Archivos índice durante la retransmisión en directo
 
 ## Configuración del servidor y transmisión
 ## Tipos de sesión
