@@ -58,6 +58,16 @@ El protocolo soporta posibles discontinuidades en las propiedades del contenido 
 
 ![Diagrama que muestra el cambio a través del tiempo entre segmentos de distintas calidades en función de la calidad de la conexión. Fallback sólo tiene audio con una imagen estática. De encoding.com](img/timestamp.png)
 
+## Tipos de sesión
+
+\HLS soporta dos tipos de sesiones: eventos y vídeo bajo demanda.
+
+El vídeo bajo demanda permite el acceso a cualquier segmento del contenido transmitido. Las ventajas que ofrece \HLS para la retransmisión de vídeo bajo demanda son la posibilidad de encriptado y el cambio entre distintas resoluciones en función de la calidad de la conexión.
+
+Dentro de los eventos (las retransmisiones en directo) se distinguen a su vez dos tipos. El tipo por defecto sólo permite el acceso a los segmentos de una cierta ventana temporal, mientras que en el segundo caso puede accederse a cualquier segmento desde que empezó la retransmisión.
+
+Además, debido a la estructura de los archivos índice (describidos en la siguiente sección) las retransmisiones en directo pueden ser convertidas en vídeo bajo demanda una vez hayan finalizado manteniendo el mismo archivo.
+
 ## Archivos de índice
 
 Una vez generados los segmentos de vídeo se genera a su vez uno o varios archivos de índice. Estos archivos indican la duración, calidad y orden en el que aparecen los distintos segmentos de tal manera que el cliente pueda solicitarlos ordenadamente al servidor.
@@ -76,7 +86,7 @@ La estructura de todo archivo índice debe ser:
 
  - `#EXTM3U`: la primera línea debe ser la etiqueta que determina que el formato es `m3u8`.
  - Un subconjunto de la siguiente lista de etiquetas:
-   - `EXT-X-PLAYLIST-TYPE:tipo`, donde `tipo` es `VOD` (Vídeo bajo demanda, en cuyo caso el índice no debe cambiar) o `EVENT` (usado en retransmisiones que permitan al usuario volver atrás, en cuyo caso el índice solo puede ser cambiado añadiendo fragmentos al final del mismo). Para una retransmisión en vivo que no garantice el almacenamiento de segmentos antiguos, puede no usarse esta etiqueta.
+   - `EXT-X-PLAYLIST-TYPE:tipo`, donde `tipo` es `VOD` (Vídeo bajo demanda, en cuyo caso el índice no debe cambiar) o `EVENT` (eventos, en cuyo caso el índice solo puede ser cambiado añadiendo fragmentos al final del mismo). Para una retransmisión en vivo que no garantice el almacenamiento de segmentos antiguos, puede no usarse esta etiqueta.
    - `EXT-X-VERSION:N`, con `N` la versión del protocolo usada. Esta etiqueta permite retrocompatibilidad. Si no se usa, se supondrá que se usa la primera versión del protocolo.
    - `EXT-X-TARGETDURATION:N`, siendo `N` la máxima duración que puede tener un segmento.
    - `EXT-X-MEDIA-SEQUENCE:N`, con `N` el número de secuencia que se corresponde con el primer segmento. Puede no ser `0` si se trata de una retransmisión en vivo que no almacena los segmentos antiguos, en cuyo caso cada vez que se elimine el primer segmento este número debe incrementarse en 1.
@@ -176,7 +186,6 @@ fileSequence6.ts
 Como podemos ver `EXT-X-MEDIA-SEQUENCE` indica que el primer segmento disponible es el tercero ya que el *streaming* ha avanzado. Además observamos que no existe la etiqueta `EXT-X-ENDLIST` para indicar que esta lista se actualizará conforme avance el *streaming*. No se indica la etiqueta `EXT-X-PLAYLIST-TYPE` por lo que se asume *streaming*.
 
 ## Configuración del servidor y transmisión
-## Tipos de sesión
 ## Encriptación
 ## Alternativas de Streaming
 ## Añadir metadatos adicionales
