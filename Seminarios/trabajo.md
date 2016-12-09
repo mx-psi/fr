@@ -15,12 +15,12 @@ geometry: margin=1.5in        # Tamaño de los márgenes
 
 # Qué es HLS
 
-HLS (del inglés *HTTP Live Streaming*) es un protocolo de transmisión de contenido multimedia para streaming y vídeo bajo demanda (*VOD*). Sus principales características como protocolo de transmisión de vídeo son:
+HLS (del inglés *HTTP Live Streaming*) es un protocolo de transmisión de contenido multimedia para streaming y vídeo bajo demanda (*VOD*) desarrollado por Apple. Sus principales características como protocolo de transmisión de vídeo son:
 
-- Se distribuye **a través de HTTP** o HTTPS, es decir, utiliza el protocolo estándar en la web y permite ser transmitido a través de un servidor web estándar.
-- **Segmenta** los vídeos en fragmentos más pequeños que pueden ser descargados independientemente e intercambiados, que pueden tener diferentes calidades y *bit rates* de tal manera que se transmita el fragmento más adecuado según la calidad de la conexión en cada momento.
+- Se distribuye **a través de HTTP** o HTTPS, es decir, utiliza el protocolo estándar en la web. Por ello, puede ser transmitido a través de un servidor web estándar.
+- **Segmenta** los vídeos en fragmentos más pequeños que pueden ser descargados independientemente e intercambiados, que pueden tener diferentes dimensiones y *bitrates* de tal manera que se transmita el fragmento más adecuado según la calidad de la conexión en cada momento.
 
-Además, este protocolo nos permite utilizar HTTPS y por tanto encriptar el contenido que se retransmite. Es un protocolo desarrollado por Apple.
+Además, este protocolo nos permite **encriptar** el contenido retransmitido, apoyándose en HTTPS para transmitir las claves a los clientes.
 
 ## Dispositivos que pueden utilizarlo
 
@@ -28,9 +28,9 @@ Al ser \HLS un protocolo diseñado por Apple los dispositivos de la misma (aquel
 
 Sin embargo, los navegadores web más utilizados como Chrome, Firefox u Opera no soportan este protocolo de forma nativa, por lo que deben transformarse los segmentos descargados, usualmente utilizando JavaScript. Este procedimiento se describe en la sección *Utilización en dispositivos que no sean Apple*.
 
-Otro software que permiten la reproducción de vídeo o streaming en este formato son iTunes desde su versión 10.1 y VLC desde su versión 2. Una lista no exhaustiva de productos que permiten parcial o totalmente la reproducción de vídeo transmitido mediante \HLS puede consultarse [aquí](https://en.wikipedia.org/wiki/HTTP_Live_Streaming#Clients).
+Otros programas que permiten la reproducción de vídeo o streaming en este formato son iTunes desde su versión 10.1 y VLC desde su versión 2. Una lista no exhaustiva de productos que permiten parcial o totalmente la reproducción de vídeo transmitido mediante \HLS puede consultarse [aquí](https://en.wikipedia.org/wiki/HTTP_Live_Streaming#Clients).
 
-En la parte del servidor tan sólo necesitamos un servidor HTTP usual configurado para especificar que los archivos índice se actualizan con mucha frecuencia de tal manera que la caché quede actualizada.
+En la parte del servidor basta con un servidor HTTP usual configurado para especificar que los archivos índice se actualicen con mucha frecuencia de tal manera que la caché quede actualizada.
 
 \newpage
 
@@ -41,9 +41,9 @@ En la parte del servidor tan sólo necesitamos un servidor HTTP usual configurad
 La arquitectura de un streaming o vídeo bajo demanda transmitido utilizando el protocolo \HLS se compone de las siguientes partes:
 
 - En primer lugar un **codificador** de archivos multimedia convierte la(s) entrada(s) de audio o vídeo a los formatos aceptados. El estándar tal y como viene definido en el *Request for Comment* no indica la necesidad de utilizar un formato concreto; en la práctica se utiliza MPEG-2.<!--TODO: Cuáles son/con qué características?-->
-- A continuación un **segmentador de flujo** divide la entrada de audio o vídeo en segmentos cortos (de unos 10 segundos de duración usualmente)
+- A continuación un **segmentador de flujo** divide la entrada de audio o vídeo en segmentos cortos (de unos 10 segundos de duración usualmente).
 - Para la distribución el servidor web genera un **archivo de índice** que incluye los segmentos mencionados anteriormente así como información sobre estos: su calidad, *bitrate* y otros metadatos que necesite el cliente para reproducir el contenido.
-- Este archivo así como los segmentos se transmiten mediante un **servidor HTTP** usual, recargando el archivo índice cuando se generen nuevos segmentos
+- Este archivo así como los segmentos se transmiten mediante un **servidor HTTP** usual, recargando el archivo índice cuando se generen nuevos segmentos.
 - El cliente **reconstruye el vídeo** a partir de los segmentos descargados de tal forma que la reproducción sea fluida.
 
 Este esquema general puede complicarse utilizando otras características del protocolo como la transmisión de vídeo en distintos formatos o calidades para conexiones más lentas o como respaldo, el añadido de subtítulos o metadatos adicionales y la encriptación del contenido enviado.
@@ -54,11 +54,11 @@ En esta sección explicamos el funcionamiento de las distintas partes del protoc
 
 ## Codificación y segmentación
 
-El vídeo se codifica en un formato que pueda ser reproducido por los posibles clientes y se segmenta en archivos `ts` junto con un archivo de índice `m3u8`. Esto puede efectuarse de una sola vez sobre un archivo de vídeo o audio preparado, o sobre la marcha en caso de una retransmisión en directo, en cuyo caso cada vez que un segmento es completado se actualiza el índice. El cliente podrá usar reconstruir el archivo o el flujo a partir de los segmentos.
+El vídeo se codifica en un formato que pueda ser reproducido por los posibles clientes y se segmenta en archivos `ts` junto con un archivo de índice `m3u8`. Esto puede efectuarse de una sola vez sobre un archivo de vídeo o audio preparado, o sobre la marcha en caso de una retransmisión en directo, en cuyo caso cada vez que un segmento es completado se actualiza el índice. El cliente podrá reconstruir el archivo o el flujo a partir de los segmentos.
 
 El protocolo soporta posibles discontinuidades en las propiedades del contenido multimedia, como la codificación o las dimensiones. En estos casos se termina un segmento en la discontinuidad y en el índice se indica que el siguiente segmento, que comienza tras la discontinuidad, tiene una configuración distinta.
 
-\HLS soporta además la transmisión en distintas resoluciones para adaptarse a la calidad de la conexión del cliente. El ratio debe ser igual en las distintas resoluciones. Estas últimas se especificarán en el archivo índice maestro como se describe en la sección *Archivos de índice*.
+\HLS soporta además la transmisión de vídeo en distintas resoluciones para adaptarse a la calidad de la conexión del cliente. La relación de aspecto debe ser igual en las distintas resoluciones. Estas últimas se especificarán en el archivo índice maestro como se describe en la sección *Archivos de índice*.
 
 ![Diagrama que muestra el cambio a través del tiempo entre segmentos de distintas calidades en función de la calidad de la conexión. Fallback sólo tiene audio con una imagen estática. De encoding.com](img/timestamp.png)
 
@@ -70,7 +70,7 @@ El vídeo bajo demanda permite el acceso a cualquier segmento del contenido tran
 
 Dentro de los eventos (las retransmisiones en directo) se distinguen a su vez dos tipos. El tipo por defecto sólo permite el acceso a los segmentos de una cierta ventana temporal, mientras que en el segundo caso puede accederse a cualquier segmento desde que empezó la retransmisión.
 
-Además, debido a la estructura de los archivos índice (describidos en la siguiente sección) las retransmisiones en directo pueden ser convertidas en vídeo bajo demanda una vez hayan finalizado manteniendo el mismo archivo.
+Además, debido a la estructura de los archivos índice (descritos en la siguiente sección) las retransmisiones en directo pueden ser convertidas en vídeo bajo demanda una vez hayan finalizado manteniendo el mismo archivo.
 
 ## Archivos de índice
 
@@ -88,20 +88,21 @@ Los archivos índice sólo pueden tener líneas en blanco, URIs (usualmente URLs
 
 La estructura de todo archivo índice debe ser:
 
+<!-- TODO: no se muestran correctamente las listas dentro de las sublistas ni las dos últimas líneas -->
  - `#EXTM3U`: la primera línea debe ser la etiqueta que determina que el formato es `m3u8`.
  - Un subconjunto de la siguiente lista de etiquetas:
-   - `EXT-X-PLAYLIST-TYPE:tipo`, donde `tipo` es `VOD` (Vídeo bajo demanda, en cuyo caso el índice no debe cambiar) o `EVENT` (eventos, en cuyo caso el índice solo puede ser cambiado añadiendo fragmentos al final del mismo). Para una retransmisión en vivo que no garantice el almacenamiento de segmentos antiguos, puede no usarse esta etiqueta.
-   - `EXT-X-VERSION:N`, con `N` la versión del protocolo usada. Esta etiqueta permite retrocompatibilidad. Si no se usa, se supondrá que se usa la primera versión del protocolo.
-   - `EXT-X-TARGETDURATION:N`, siendo `N` la máxima duración que puede tener un segmento.
-   - `EXT-X-MEDIA-SEQUENCE:N`, con `N` el número de secuencia que se corresponde con el primer segmento. Puede no ser `0` si se trata de una retransmisión en vivo que no almacena los segmentos antiguos, en cuyo caso cada vez que se elimine el primer segmento este número debe incrementarse en 1.
+   - `#EXT-X-PLAYLIST-TYPE:tipo`, donde `tipo` es `VOD` (Vídeo bajo demanda, en cuyo caso el índice no debe cambiar) o `EVENT` (eventos, en cuyo caso el índice solo puede ser cambiado añadiendo fragmentos al final del mismo). Para una retransmisión en vivo que no garantice el almacenamiento de segmentos antiguos, puede no usarse esta etiqueta.
+   - `#EXT-X-VERSION:N`, con `N` la versión del protocolo usada. Esta etiqueta permite retrocompatibilidad. Si no se usa, se supondrá que se usa la primera versión del protocolo.
+   - `#EXT-X-TARGETDURATION:N`, siendo `N` la máxima duración que puede tener un segmento.
+   - `#EXT-X-MEDIA-SEQUENCE:N`, con `N` el número de secuencia que se corresponde con el primer segmento. Puede no ser `0` si se trata de una retransmisión en vivo que no almacena los segmentos antiguos, en cuyo caso cada vez que se elimine el primer segmento este número debe incrementarse en 1.
  - Una lista con un elemento de la siguiente forma para cada segmento:
-   - `#EXTINF:N`, siendo `N` un número en punto flotante que indica la duración del segmento. Típicamente es `10.0` para todos los segmentos salvo el último.
+   - `#EXTINF:N`, siendo `N` un número en punto flotante que indica la duración del segmento. Típicamente es `10.0` para todos los segmentos salvo el último, aunque en caso de discontinuidad en las propiedades del vídeo podría haber más segmentos con longitud menor y el protocolo no obliga a que la longitud máxima sea `10.0`.
    - Una URL que apunte al segmento. Puede ser relativa o absoluta.
 
    Si dos de estos elementos usan segmentos con distinta codificación, puede informarse de ello al cliente mediante una línea la etiqueta `#EXT-X-DISCONTINUITY` entre ambos.
  - Opcionalmente puede terminar por la etiqueta `#EXT-X-ENDLIST`. La presencia de esta etiqueta indica que no se añadirán más fragmentos al índice.
 
-Un ejemplo de un archivo índice para un vídeo bajo demanda con 4 segmentos de 10 segundos de duración es:
+Un ejemplo de un archivo índice para un vídeo bajo demanda con 4 segmentos de un total de 39 segundos de duración es:
 
 \vspace*{0.75cm}
 
@@ -124,7 +125,7 @@ http://example.com/movie1/fileSequenceD.ts
 
 \vspace*{0.75cm}
 
-Si las rutas estuvieran expresadas de forma relativa (tal y como recomienda el estándar) deberían indicarse simplemente el nombre de cada fichero `.ts`.
+Si las rutas estuvieran expresadas de forma relativa, tal y como recomienda el estándar, bastaría indicar el nombre de cada fichero `.ts`.
 
 ### Archivo índice maestro
 
@@ -132,13 +133,13 @@ Si las rutas estuvieran expresadas de forma relativa (tal y como recomienda el e
 
 Para crear estructuras más complejas puede utilizarse una **lista de reproducción maestra**. Este archivo índice maestro (guardado también en `.m3u8`) proporciona una lista de flujos que los clientes pueden utilizar en función de sus preferencias. Algunas de las características posibles especificadas por el estándar e implementadas en el software de Apple son:
 
-- Proporcionar vídeo en distintas resoluciones, *bit rates* y formatos
+- Proporcionar vídeo en distintas resoluciones, *bitrates* y formatos
 - Proporcionar flujos de respaldo en distintos servidores para evitar fallos
 - Proporciona audio en distintos idiomas o con distintos vídeos (distintos ángulos de cámara etc.)
 
 El cliente es responsable de cambiar entre estos flujos en función de sus preferencias y la calidad de su conexión. En el caso de la calidad, el primer flujo descrito en el archivo índice maestro será el que se utilice para realizar una prueba de la calidad de la conexión. La relación de aspecto de los distintos flujos ofrecidos debe ser la misma (4:3, 16:9), aunque la resolución puede variar. Esta se indica en el campo `RESOLUTION` de `EXT-X-STREAM-INF` para ayudar al cliente a decidir.
 
-Los flujos de respaldo se utilizan en el caso de que alguno de los flujos dé un fallo 404 o cualquier otro error. En caso de error el cliente escoge el siguiente flujo con más ancho de banda, escogiendo el que se encuentre antes en la lista si hay empate.
+Los flujos de respaldo se utilizan en caso de que alguno de los flujos dé un error 404 o cualquier otro fallo. En caso de error el cliente escoge el siguiente flujo con más ancho de banda, escogiendo el que se encuentre antes en la lista si hay empate.
 
 Un ejemplo de un archivo índice maestro con dos flujos con distinta calidad y flujos de respaldo (extraído de la documentación de Apple) es:
 
@@ -223,15 +224,15 @@ http://media.example.com/fileSequence53-A.ts
 ```
 \vspace*{0.75cm}
 
-Como podemos ver la etiqueta `EXT-X-KEY` especifica el método de encriptación y la localización de la clave (que se sirve mediante HTTPS) para cada colección de segmentos hasta que se indique una nueva clave (en este caso cada 3 segmentos). Si tuvieramos segmentos no encriptados deberíamos indicar mediante una etiqueta `EXT-X-KEY` que el método de encriptado es `NONE`.
+Como podemos ver la etiqueta `EXT-X-KEY` especifica el método de encriptación y la localización de la clave (que se sirve mediante HTTPS) para cada colección de segmentos hasta que se indique una nueva clave (en este caso cada 3 segmentos). Si hubiera segmentos no encriptados se debería indicar mediante una etiqueta `EXT-X-KEY` que el método de encriptado es `NONE`.
 
 El cliente detectará el método indicado y utilizará la clave provista para desencriptar en tiempo real los segmentos solicitados.
 
 ## Añadir metadatos adicionales
 
-Además de la transmisión del audio y vídeo \HLS permite la transmisión de metadatos que acompañen a los segmentos, como, en el caso de la transmisión de música, información sobre el artista, o el nombre de la canción. Estos metadatos adicionales pueden acompañar el audio en formato `id3`.
+Además de la transmisión del audio y vídeo \HLS permite la transmisión de metadatos que acompañen a los segmentos, como, en el caso de la transmisión de música, información sobre el artista o el nombre de la canción. Estos metadatos adicionales pueden acompañar el audio en formato `id3`.
 
-Otros metadatos posibles son los subtítulos. \HLS soporta subtítulos o *closed-captions* que sigan la especificación `WebVTT`. Este formato permite la aplicación de estilo utilizando CSS y otros metadatos semánticos. Un ejemplo de archivo índice maestro con múltiples subtítulos, obtenido de la documentación de Apple es:
+Otros metadatos posibles son los subtítulos. \HLS soporta subtítulos o *closed-captions* que sigan la especificación `WebVTT`. Este formato permite la aplicación de estilo utilizando CSS y otros metadatos semánticos. Un ejemplo de archivo índice maestro con múltiples subtítulos, obtenido de la documentación de Apple, es:
 
 \vspace*{0.75cm}
 
