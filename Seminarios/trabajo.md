@@ -30,6 +30,8 @@ Sin embargo, los navegadores web más utilizados como Chrome, Firefox u Opera no
 
 Otro software que permiten la reproducción de vídeo o streaming en este formato son iTunes desde su versión 10.1 y VLC desde su versión 2. Una lista no exhaustiva de productos que permiten parcial o totalmente la reproducción de vídeo transmitido mediante \HLS puede consultarse [aquí](https://en.wikipedia.org/wiki/HTTP_Live_Streaming#Clients).
 
+En la parte del servidor tan sólo necesitamos un servidor HTTP usual configurado para especificar que los archivos índice se actualizan con mucha frecuencia de tal manera que la caché quede actualizada.
+
 \newpage
 
 ## Visión general de la arquitectura
@@ -55,6 +57,8 @@ En esta sección explicamos el funcionamiento de las distintas partes del protoc
 El vídeo se codifica en un formato que pueda ser reproducido por los posibles clientes y se segmenta en archivos `ts` junto con un archivo de índice `m3u8`. Esto puede efectuarse de una sola vez sobre un archivo de vídeo o audio preparado, o sobre la marcha en caso de una retransmisión en directo, en cuyo caso cada vez que un segmento es completado se actualiza el índice. El cliente podrá usar reconstruir el archivo o el flujo a partir de los segmentos.
 
 El protocolo soporta posibles discontinuidades en las propiedades del contenido multimedia, como la codificación o las dimensiones. En estos casos se termina un segmento en la discontinuidad y en el índice se indica que el siguiente segmento, que comienza tras la discontinuidad, tiene una configuración distinta.
+
+\HLS soporta además la transmisión en distintas resoluciones para adaptarse a la calidad de la conexión del cliente. El ratio debe ser igual en las distintas resoluciones. Estas últimas se especificarán en el archivo índice maestro como se describe en la sección *Archivos de índice*.
 
 ![Diagrama que muestra el cambio a través del tiempo entre segmentos de distintas calidades en función de la calidad de la conexión. Fallback sólo tiene audio con una imagen estática. De encoding.com](img/timestamp.png)
 
@@ -99,7 +103,7 @@ La estructura de todo archivo índice debe ser:
 
 Un ejemplo de un archivo índice para un vídeo bajo demanda con 4 segmentos de 10 segundos de duración es:
 
-\vspace*{1cm}
+\vspace*{0.75cm}
 
 ```
 #EXTM3U
@@ -118,7 +122,7 @@ http://example.com/movie1/fileSequenceD.ts
 #EXT-X-ENDLIST
 ```
 
-\vspace*{1cm}
+\vspace*{0.75cm}
 
 Si las rutas estuvieran expresadas de forma relativa (tal y como recomienda el estándar) deberían indicarse simplemente el nombre de cada fichero `.ts`.
 
@@ -138,7 +142,7 @@ Los flujos de respaldo se utilizan en el caso de que alguno de los flujos dé un
 
 Un ejemplo de un archivo índice maestro con dos flujos con distinta calidad y flujos de respaldo (extraído de la documentación de Apple) es:
 
-\vspace*{1cm}
+\vspace*{0.75cm}
 
 ```
 #EXTM3U
@@ -153,7 +157,7 @@ http://ALPHA.mycompany.com/md/prog_index.m3u8
 http://BETA.mycompany.com/md/prog_index.m3u8
 ```
 
-\vspace*{1cm}
+\vspace*{0.75cm}
 
 La primera línea identifica el archivo como un archivo índice. A continuación se listan las URLs de los archivos índice de los distintos flujos. Los primeros flujos indican una resolución baja mientras que los segundos tienen una resolución 1080p. El servidor `BETA` sirve de respaldo al servidor `ALPHA`. El estándar no limita el posible número de flujos de respaldo.
 
@@ -163,7 +167,7 @@ Aunque no es obligatorio, el estándar recomienda que el audio sea el mismo entr
 
 Durante la retransmisión de un *streaming* se utiliza una única lista de reproducción que se va actualizando. Un ejemplo de un archivo índice en un cierto momento del *streaming* es:
 
-\vspace*{1cm}
+\vspace*{0.75cm}
 
 ```
 #EXTM3U
@@ -181,14 +185,72 @@ fileSequence5.ts
 #EXTINF:10,
 fileSequence6.ts
 ```
-\vspace*{1cm}
+\vspace*{0.75cm}
 
 Como podemos ver `EXT-X-MEDIA-SEQUENCE` indica que el primer segmento disponible es el tercero ya que el *streaming* ha avanzado. Además observamos que no existe la etiqueta `EXT-X-ENDLIST` para indicar que esta lista se actualizará conforme avance el *streaming*. No se indica la etiqueta `EXT-X-PLAYLIST-TYPE` por lo que se asume *streaming*.
 
-## Configuración del servidor y transmisión
 ## Encriptación
-## Alternativas de Streaming
+
+Los segmentos `.ts` pueden ser encriptados individualmente. En este caso las referencias a las claves necesarias para desencriptarlos aparecen en el archivo índice para que el cliente pueda obtenerlo. Actualmente \HLS soporta encriptado AES-128 usando claves de 16 octetos. Las cabeceras de los segmentos no son encriptadas para transmitir la información sobre la longitud.
+
+Puede utilizarse la misma clave para todos los segmentos o cambiar la clave cada $n$ segmentos. Las claves requieren además un vector de inicialización que también puede cambiar periódicamente.
+
+Para mantener la seguridad es importante enviar las claves mediante HTTPS. No se recomienda en cambio transmitir los segmentos y archivos índice mediante HTTPS ya que esto impediría que los archivos enviados se almacenaran en caché, redirigiendo todas las peticiones a nuestro servidor.
+
+Un ejemplo de un archivo índice con segmentos encriptados es:
+
+\vspace*{0.75cm}
+
+```
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-MEDIA-SEQUENCE:7794
+#EXT-X-TARGETDURATION:15
+
+#EXT-X-KEY:METHOD=AES-128,URI="https://priv.example.com/key.php?r=52"
+
+#EXTINF:2.833,
+http://media.example.com/fileSequence52-A.ts
+#EXTINF:15.0,
+http://media.example.com/fileSequence52-B.ts
+#EXTINF:13.333,
+http://media.example.com/fileSequence52-C.ts
+
+#EXT-X-KEY:METHOD=AES-128,URI="https://priv.example.com/key.php?r=53"
+
+#EXTINF:15.0,
+http://media.example.com/fileSequence53-A.ts
+```
+\vspace*{0.75cm}
+
+Como podemos ver la etiqueta `EXT-X-KEY` especifica el método de encriptación y la localización de la clave (que se sirve mediante HTTPS) para cada colección de segmentos hasta que se indique una nueva clave (en este caso cada 3 segmentos). Si tuvieramos segmentos no encriptados deberíamos indicar mediante una etiqueta `EXT-X-KEY` que el método de encriptado es `NONE`.
+
+El cliente detectará el método indicado y utilizará la clave provista para desencriptar en tiempo real los segmentos solicitados.
+
 ## Añadir metadatos adicionales
+
+Además de la transmisión del audio y vídeo \HLS permite la transmisión de metadatos que acompañen a los segmentos, como, en el caso de la transmisión de música, información sobre el artista, o el nombre de la canción. Estos metadatos adicionales pueden acompañar el audio en formato `id3`.
+
+Otros metadatos posibles son los subtítulos. \HLS soporta subtítulos o *closed-captions* que sigan la especificación `WebVTT`. Este formato permite la aplicación de estilo utilizando CSS y otros metadatos semánticos. Un ejemplo de archivo índice maestro con múltiples subtítulos, obtenido de la documentación de Apple es:
+
+\vspace*{0.75cm}
+
+```
+#EXTM3U
+
+#EXT-X-MEDIA:TYPE=CLOSED-CAPTIONS,GROUP-ID="cc",
+NAME="CC1",LANGUAGE="en",DEFAULT=YES,AUTOSELECT=YES,INSTREAM-ID="CC1"
+#EXT-X-MEDIA:TYPE=CLOSED-CAPTIONS,GROUP-ID="cc",
+NAME="CC2",LANGUAGE="sp",AUTOSELECT=YES,INSTREAM-ID="CC2"
+
+#EXT-X-STREAM-INF:BANDWIDTH=1000000,SUBTITLES="subs",CLOSED-CAPTIONS="cc"
+x.m3u8
+```
+\vspace*{0.75cm}
+
+Como vemos se incluyen subtítulos en inglés y español, para los que se especifica una id de grupo (`cc`) que posteriormente se indica en el stream adecuado. La especificación de la duración de cada segmento de vídeo permite la sincronización de los subtítulos.
+
+Los subtítulos también pueden dividirse en segmentos que se transmiten junto con los segmentos de audio y vídeo durante el stream (para permitir subtítulos simultáneos con una transmisión en directo). Estos segmentos se especifican en la etiqueta `#EXT-X-STREAM-INF`.
 
 # Cómo se relaciona con el resto de elementos HTML
 ## El elemento `video`
@@ -210,5 +272,7 @@ TODO:
 - [Adaptive Streaming with HLS in HTML5](https://www.jwplayer.com/blog/hls-in-html5/)
 - [MediaSource - Web API reference](https://developer.mozilla.org/es/docs/Web/API/MediaSource)
 
+
+\newpage
 
 \input{bibliografia}
