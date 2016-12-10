@@ -1,0 +1,21 @@
+<html>
+<script src="hls.min.js"></script>
+<head>
+    <title>HTTP Live Streaming Example</title>
+</head>
+<body>
+    <video id="video"></video>
+    <script>
+      if(Hls.isSupported()) {
+        var video = document.getElementById('video');
+        var hls = new Hls();
+        hls.loadSource('demo.m3u8');
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED,function() {
+          video.play();
+      });
+     }
+    </script>
+    </video>
+</body>
+</html>
