@@ -48,6 +48,16 @@ La arquitectura de un streaming o vídeo bajo demanda transmitido utilizando el 
 
 Este esquema general puede complicarse utilizando otras características del protocolo como la transmisión de vídeo en distintos formatos o calidades para conexiones más lentas o como respaldo, el añadido de subtítulos o metadatos adicionales y la encriptación del contenido enviado.
 
+## Diferencias entre versiones
+
+Desde su versión inicial presentada en mayo de 2009 la especificación de \HLS ha sufrido múltiples cambios y han sido añadidas nuevas funcionalidades, contando en el momento presente con un total de 19 revisiones.
+
+Este trabajo describe las características principales de \HLS en su versión 19 presentada este mismo año. A continuación presentamos una lista no exhaustiva de las nuevas funcionalidades y cambios que han añadido algunas versiones:
+
+- Las versiones 02 a 05 añaden la capacidad de streams alternativos, añadido de metadatos y duraciones no enteras de los segmentos.
+- Las versiones 07 a 11 introducen la capacidad de especificar segmentos como secciones contiguas de un fichero mayor, especificadas con `EXT-X-BYTERANGE`.
+- Las versiones 14 a 16 reescriben algunas partes de la especificación y permiten especificar el ancho de banda medio.
+
 # Funcionamiento del protocolo
 
 En esta sección explicamos el funcionamiento de las distintas partes del protocolo detalladas en la visión general de la arquitectura.
@@ -253,26 +263,64 @@ Como vemos se incluyen subtítulos en inglés y español, para los que se especi
 
 Los subtítulos también pueden dividirse en segmentos que se transmiten junto con los segmentos de audio y vídeo durante el stream (para permitir subtítulos simultáneos con una transmisión en directo). Estos segmentos se especifican en la etiqueta `#EXT-X-STREAM-INF`.
 
-# Cómo se relaciona con el resto de elementos HTML
-## El elemento `video`
+# Implementación en el cliente
 
-## Utilización en dispositivos que no sean Apple
+La visualización de contenido suministrado siguiendo el protocolo \HLS puede hacerse con cualquiera de los dispositivos mencionados en *Dispositivos que pueden utilizarlo*. En la práctica es común visualizar este tipo de contenidos mediante un navegador, de tal manera que el cliente no tenga que instalar *software* adicional. En estas secciones especificamos como integrar \HLS en HTML, tanto en dispositivos Apple como en aquellos que no tienen un soporte nativo.
+
+## En navegadores con soporte nativo
+
+En dispositivos y navegadores con soporte nativo basta utilizar el elemento `video` de HTML5 especificando como URL en la fuente (mediante el campo `src`) el archivo índice maestro del streaming o vídeo bajo demanda a reproducir:
+
+```html
+<html>
+<head>
+    <title>Ejemplo con soporte nativo</title>
+</head>
+<body>
+    <video
+        src="http://ejemplo.com/streaming.m3u8"
+        height="300" width="400"
+        >
+    </video>
+</body>
+</html>
+```
+
+Si queremos podemos utilizar las capacidades de JavaScript para modificar el comportamiento y visualización del contenido a través de las funciones definidas para `video`. Estas permiten la reproducción automática y la asociación de la reproducción/pausa del contenido a partir de acciones en la página.
+
+## En navegadores sin soporte nativo
 
 \HLS tiene soporte por defecto en dispositivos Apple, en Safari y en las versiones para iOS y Android del navegador Google Chrome. Para el resto de dispositivos es necesario adaptar el protocolo para asegurar la reproducción utilizando JavaScript.
 
-La biblioteca más común es `hls.js`, desarrollada por Dailymotion. Esta librería convierte los segmentos de vídeo recibidos para utilizar MediaSource, una extensión de HTML5 que permite la transmisión de audio y vídeo. Las siguientes subsecciones describen brevemente el funcionamiento de esta librería.
+La biblioteca más común es `hls.js`, desarrollada por Dailymotion. Esta librería convierte los segmentos de vídeo recibidos y los representa a través de la especificación Media Source Extensions.
 
-<!--
-TODO:
-- Cómo funciona MediaSource
-- Cómo funciona hls.js
--->
-- [Media Source Extensions™](https://www.w3.org/TR/media-source/)
-- [Introducing hls.js](http://engineering.dailymotion.com/introducing-hls-js/)
-- [dailymotion/hls.js: MSE-based HLS client - http://dailymotion.github.io/hls.js/demo](https://github.com/dailymotion/hls.js)
-- [Adaptive Streaming with HLS in HTML5](https://www.jwplayer.com/blog/hls-in-html5/)
-- [MediaSource - Web API reference](https://developer.mozilla.org/es/docs/Web/API/MediaSource)
+Esta especificación permite la captación, precaptación y el almacenamiento en buffer de contenido multimedia utilizando JavaScript.
 
+Un ejemplo mínimo del código necesario para utilizar esta librería es:
+
+```html
+<html>
+<head>
+    <title>Ejemplo con soporte nativo</title>
+</head>
+<body>
+  <!-- Código de hls.js -->
+  <script src="https://cdn.jsdelivr.net/hls.js/latest/hls.min.js"></script>
+  <video id="video"></video>
+  <script>
+    if(Hls.isSupported()) { // Si hay soporte para HLS
+      var video = document.getElementById('video');
+      var hls = new Hls();
+      hls.loadSource('http://ejemplo.com/streaming.m3u8'); // Carga el stream
+      hls.attachMedia(video); // Muéstralo en vídeo
+      hls.on(Hls.Events.MANIFEST_PARSED,function() {
+        video.play(); // Reprodúcelo automáticamente
+    });
+   }
+  </script>
+</body>
+</html>
+```
 
 \newpage
 
