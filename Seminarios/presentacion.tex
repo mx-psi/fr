@@ -66,16 +66,123 @@ literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1
 \begin{frame}{¿Qué es HLS?}
   HTTP Live Streaming es un protocolo de transmisión de \textbf{streaming} y \textbf{vídeo bajo demanda}.
 
-  Es soportado por dispositivos móviles con iOS y Android y ha sido utilizado por páginas como TED, Twitter %o Twitch?
+  Es soportado por dispositivos móviles con iOS y Android y ha sido utilizado por páginas como TED, Twitter o Twitch
 \end{frame}
 
 \begin{frame}{Características}
   Sus principales características son:
   \begin{itemize}
-    \item Se transmite mediante \textbf{HTTP} (no necesita configuración adicional)
+    \item Se transmite mediante \textbf{HTTP} % no necesita más configuración
     \item Permite adaptar la calidad del vídeo según la conexión
     \item Permite encriptar el vídeo y transmitir metadatos adicionales
+    \item Puede utilizarse en la mayor parte de dispositivos
   \end{itemize}
+\end{frame}
+
+\begin{frame}{Visión general}
+  \only<1>{
+  \begin{itemize}
+    \item El vídeo se divide en segmentos en distintas calidades
+    \item Se crea una archivo índice con los segmentos
+    \item Se transmite al cliente mediante HTTP
+    \item Se reconstruye en el cliente
+  \end{itemize}
+  }
+  \only<2>{
+  \begin{center}
+    \includegraphics[scale=0.2]{img/visionGeneral.png}
+  \end{center}}
+\end{frame}
+
+
+\begin{frame}{Tipos de sesión}
+  Los vídeos transmitidos pueden ser:
+  \begin{itemize}
+    \item En \textbf{tiempo real} (no permite avance y retroceso en general)
+    \item Como \textbf{vídeo bajo demanda} (permite avance y retroceso)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Codificación y segmentación}
+  \includegraphics[scale=0.9]{img/timestamp.png}
+
+  El vídeo se codifica en un formato que reproduzcan los clientes.
+
+  Se generan segmentos cortos (10s) de distintas calidades.
+\end{frame}
+
+\begin{frame}[fragile]{Archivos de índice}
+  Los segmentos de la misma calidad se ordenan en un \textbf{archivo índice}:
+
+\begin{lstlisting}
+#EXTM3U
+#EXT-X-PLAYLIST-TYPE:VOD
+#EXT-X-TARGETDURATION:10
+#EXT-X-VERSION:3
+#EXT-X-MEDIA-SEQUENCE:0
+#EXTINF:10.0,
+http://example.com/movie1/fileSequenceA.ts
+#EXTINF:10.0,
+http://example.com/movie1/fileSequenceB.ts
+#EXTINF:10.0,
+http://example.com/movie1/fileSequenceC.ts
+#EXTINF:9.0,
+http://example.com/movie1/fileSequenceD.ts
+#EXT-X-ENDLIST
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Índice maestro}
+  Los archivos índice de las distintas calidades se muestran en uno \textbf{maestro}:
+\begin{center}
+\includegraphics[scale=0.17]{img/indiceMaestro.png}
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Ejemplo de índice maestro}
+\begin{lstlisting}
+#EXTM3U
+#EXT-X-STREAM-INF:PROGRAM-ID=1, RESOLUTION=720x480
+http://ALPHA.mycompany.com/lo/prog_index.m3u8
+#EXT-X-STREAM-INF:PROGRAM-ID=1, RESOLUTION=720x480
+http://BETA.mycompany.com/lo/prog_index.m3u8
+
+#EXT-X-STREAM-INF:PROGRAM-ID=1, RESOLUTION=1920x1080
+http://ALPHA.mycompany.com/md/prog_index.m3u8
+#EXT-X-STREAM-INF:PROGRAM-ID=1, RESOLUTION=1920x1080
+http://BETA.mycompany.com/md/prog_index.m3u8
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Índice en streaming}
+\texttt{EXT-X-MEDIA-SEQUENCE} indica el primer segmento disponible:
+
+\begin{lstlisting}
+#EXTM3U
+#EXT-X-TARGETDURATION:10
+#EXT-X-VERSION:3
+#EXT-X-MEDIA-SEQUENCE:2
+#EXTINF:10,
+fileSequence2.ts
+#EXTINF:10,
+fileSequence3.ts
+#EXTINF:10,
+fileSequence4.ts
+#EXTINF:10,
+fileSequence5.ts
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Encriptación} %?
+\end{frame}
+
+\begin{frame}{Subtítulos}
+\end{frame}
+
+\begin{frame}{En el cliente (nativo)}
+\end{frame}
+
+\begin{frame}{En el cliente (\texttt{hls.js})}
 \end{frame}
 
 \end{document}
