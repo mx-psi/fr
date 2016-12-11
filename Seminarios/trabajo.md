@@ -52,7 +52,7 @@ Este esquema general puede complicarse utilizando otras características del pro
 
 Desde su versión inicial presentada en mayo de 2009 la especificación de \HLS ha sufrido múltiples cambios y han sido añadidas nuevas funcionalidades, contando en el momento presente con un total de 19 revisiones.
 
-Este trabajo describe las características principales de \HLS en su versión 19 presentada este mismo año. A continuación presentamos una lista no exhaustiva de las nuevas funcionalidades y cambios que han añadido algunas versiones:
+Este trabajo describe las características principales de \HLS en su versión 19 presentada este mismo año. A continuación mostramos una lista no exhaustiva de las nuevas funcionalidades y cambios que han añadido algunas versiones:
 
 - Las versiones 02 a 05 añaden la capacidad de streams alternativos, añadido de metadatos y duraciones no enteras de los segmentos.
 - Las versiones 07 a 11 introducen la capacidad de especificar segmentos como secciones contiguas de un fichero mayor, especificadas con `EXT-X-BYTERANGE`.
