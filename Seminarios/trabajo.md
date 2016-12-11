@@ -40,7 +40,7 @@ En la parte del servidor basta con un servidor HTTP usual configurado para espec
 
 La arquitectura de un streaming o vídeo bajo demanda transmitido utilizando el protocolo \HLS se compone de las siguientes partes:
 
-- En primer lugar un **codificador** de archivos multimedia convierte la(s) entrada(s) de audio o vídeo a los formatos aceptados. El estándar tal y como viene definido en el *Request for Comment* no indica la necesidad de utilizar un formato concreto; en la práctica se utiliza MPEG-2.<!--TODO: Cuáles son/con qué características?-->
+- En primer lugar un **codificador** de archivos multimedia convierte la(s) entrada(s) de audio o vídeo a los formatos aceptados. El estándar tal y como viene definido en el *Request for Comment* no indica la necesidad de utilizar un formato concreto: sólo necesitamos que pueda ser reproducido en el cliente.
 - A continuación un **segmentador de flujo** divide la entrada de audio o vídeo en segmentos cortos (de unos 10 segundos de duración usualmente).
 - Para la distribución el servidor web genera un **archivo de índice** que incluye los segmentos mencionados anteriormente así como información sobre estos: su calidad, *bitrate* y otros metadatos que necesite el cliente para reproducir el contenido.
 - Este archivo así como los segmentos se transmiten mediante un **servidor HTTP** usual, recargando el archivo índice cuando se generen nuevos segmentos.
@@ -57,6 +57,8 @@ Este trabajo describe las características principales de \HLS en su versión 19
 - Las versiones 02 a 05 añaden la capacidad de streams alternativos, añadido de metadatos y duraciones no enteras de los segmentos.
 - Las versiones 07 a 11 introducen la capacidad de especificar segmentos como secciones contiguas de un fichero mayor, especificadas con `EXT-X-BYTERANGE`.
 - Las versiones 14 a 16 reescriben algunas partes de la especificación y permiten especificar el ancho de banda medio.
+
+\newpage
 
 # Funcionamiento del protocolo
 
@@ -98,19 +100,19 @@ Los archivos índice sólo pueden tener líneas en blanco, URIs (usualmente URLs
 
 La estructura de todo archivo índice debe ser:
 
-<!-- TODO: no se muestran correctamente las listas dentro de las sublistas ni las dos últimas líneas -->
  - `#EXTM3U`: la primera línea debe ser la etiqueta que determina que el formato es `m3u8`.
  - Un subconjunto de la siguiente lista de etiquetas:
-   - `#EXT-X-PLAYLIST-TYPE:tipo`, donde `tipo` es `VOD` (Vídeo bajo demanda, en cuyo caso el índice no debe cambiar) o `EVENT` (eventos, en cuyo caso el índice solo puede ser cambiado añadiendo fragmentos al final del mismo). Para una retransmisión en vivo que no garantice el almacenamiento de segmentos antiguos, puede no usarse esta etiqueta.
-   - `#EXT-X-VERSION:N`, con `N` la versión del protocolo usada. Esta etiqueta permite retrocompatibilidad. Si no se usa, se supondrá que se usa la primera versión del protocolo.
-   - `#EXT-X-TARGETDURATION:N`, siendo `N` la máxima duración que puede tener un segmento.
-   - `#EXT-X-MEDIA-SEQUENCE:N`, con `N` el número de secuencia que se corresponde con el primer segmento. Puede no ser `0` si se trata de una retransmisión en vivo que no almacena los segmentos antiguos, en cuyo caso cada vez que se elimine el primer segmento este número debe incrementarse en 1.
+     * `#EXT-X-PLAYLIST-TYPE:tipo`, donde `tipo` es `VOD` (Vídeo bajo demanda, en cuyo caso el índice no debe cambiar) o `EVENT` (eventos, en cuyo caso el índice solo puede ser cambiado añadiendo fragmentos al final del mismo). Para una retransmisión en vivo que no garantice el almacenamiento de segmentos antiguos, puede no usarse esta etiqueta.
+     * `#EXT-X-VERSION:N`, con `N` la versión del protocolo usada. Esta etiqueta permite retrocompatibilidad. Si no se usa, se supondrá que se usa la primera versión del protocolo.
+     * `#EXT-X-TARGETDURATION:N`, siendo `N` la máxima duración que puede tener un segmento.
+     * `#EXT-X-MEDIA-SEQUENCE:N`, con `N` el número de secuencia que se corresponde con el primer segmento. Puede no ser `0` si se trata de una retransmisión en vivo que no almacena los segmentos antiguos, en cuyo caso cada vez que se elimine el primer segmento este número debe incrementarse en 1.
  - Una lista con un elemento de la siguiente forma para cada segmento:
-   - `#EXTINF:N`, siendo `N` un número en punto flotante que indica la duración del segmento. Típicamente es `10.0` para todos los segmentos salvo el último, aunque en caso de discontinuidad en las propiedades del vídeo podría haber más segmentos con longitud menor y el protocolo no obliga a que la longitud máxima sea `10.0`.
-   - Una URL que apunte al segmento. Puede ser relativa o absoluta.
-
+     * `#EXTINF:N`, siendo `N` un número en punto flotante que indica la duración del segmento. Típicamente es `10.0` para todos los segmentos salvo el último, aunque en caso de discontinuidad en las propiedades del vídeo podría haber más segmentos con longitud menor y el protocolo no obliga a que la longitud máxima sea `10.0`.
+     * Una URL que apunte al segmento. Puede ser relativa o absoluta.
    Si dos de estos elementos usan segmentos con distinta codificación, puede informarse de ello al cliente mediante una línea la etiqueta `#EXT-X-DISCONTINUITY` entre ambos.
  - Opcionalmente puede terminar por la etiqueta `#EXT-X-ENDLIST`. La presencia de esta etiqueta indica que no se añadirán más fragmentos al índice.
+
+\newpage
 
 Un ejemplo de un archivo índice para un vídeo bajo demanda con 4 segmentos de un total de 39 segundos de duración es:
 
@@ -173,6 +175,8 @@ http://BETA.mycompany.com/md/prog_index.m3u8
 La primera línea identifica el archivo como un archivo índice. A continuación se listan las URLs de los archivos índice de los distintos flujos. Los primeros flujos indican una resolución baja mientras que los segundos tienen una resolución 1080p. El servidor `BETA` sirve de respaldo al servidor `ALPHA`. El estándar no limita el posible número de flujos de respaldo.
 
 Aunque no es obligatorio, el estándar recomienda que el audio sea el mismo entre los distintos flujos aunque la calidad de la imagen varíe. Esto permite la transición entre estos sin *glitches* auditivos.
+
+\newpage
 
 ### Archivos índice durante la retransmisión en directo
 
@@ -288,6 +292,8 @@ En dispositivos y navegadores con soporte nativo basta utilizar el elemento `vid
 
 Si queremos podemos utilizar las capacidades de JavaScript para modificar el comportamiento y visualización del contenido a través de las funciones definidas para `video`. Estas permiten la reproducción automática y la asociación de la reproducción/pausa del contenido a partir de acciones en la página.
 
+\newpage
+
 ## En navegadores sin soporte nativo
 
 \HLS tiene soporte por defecto en dispositivos Apple, en Safari y en las versiones para iOS y Android del navegador Google Chrome. Para el resto de dispositivos es necesario adaptar el protocolo para asegurar la reproducción utilizando JavaScript.
@@ -301,7 +307,7 @@ Un ejemplo mínimo del código necesario para utilizar esta librería es:
 ```html
 <html>
 <head>
-    <title>Ejemplo con soporte nativo</title>
+    <title>Ejemplo sin soporte nativo</title>
 </head>
 <body>
   <!-- Código de hls.js -->
