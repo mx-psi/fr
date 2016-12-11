@@ -30,6 +30,21 @@ literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1
          {ú}{{\'u}}1 {ñ}{{\~n}}1 {¡}{{\textexclamdown}}1
 }
 
+\lstdefinelanguage{JavaScript}{
+  keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+  keywordstyle=\color{blue}\bfseries,
+  ndkeywords={class, export, boolean, throw, implements, import, this},
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
+}
+
 % Solarized palette
 \definecolor{solarizedBase03}{HTML}{002B36}
 \definecolor{solarizedBase02}{HTML}{073642}
@@ -173,16 +188,78 @@ fileSequence5.ts
 \end{lstlisting}
 \end{frame}
 
-\begin{frame}{Encriptación} %?
+\begin{frame}[fragile]{Encriptación} %?
+
+\texttt{EXT-X-KEY} indice la clave a utilizar:
+
+\begin{lstlisting}
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:15
+
+#EXT-X-KEY:METHOD=AES-128,URI="https://priv.example.com/key.php?r=52"
+
+#EXTINF:2.833,
+http://media.example.com/fileSequence52-A.ts
+
+#EXT-X-KEY:METHOD=AES-128,URI="https://priv.example.com/key.php?r=53"
+
+#EXTINF:15.0,
+http://media.example.com/fileSequence53-A.ts
+\end{lstlisting}
 \end{frame}
 
-\begin{frame}{Subtítulos}
+\begin{frame}[fragile]{Subtítulos}
+Podemos añadir subtítulos en varios idiomas especificando el estilo con CSS:
+
+\begin{lstlisting}
+#EXTM3U
+
+#EXT-X-MEDIA:TYPE=CLOSED-CAPTIONS,GROUP-ID="cc",
+NAME="CC1",LANGUAGE="en",DEFAULT=YES,AUTOSELECT=YES,INSTREAM-ID="CC1"
+#EXT-X-MEDIA:TYPE=CLOSED-CAPTIONS,GROUP-ID="cc",
+NAME="CC2",LANGUAGE="sp",AUTOSELECT=YES,INSTREAM-ID="CC2"
+
+#EXT-X-STREAM-INF:BANDWIDTH=1000000,SUBTITLES="subs",CLOSED-CAPTIONS="cc"
+x.m3u8
+\end{lstlisting}
 \end{frame}
 
-\begin{frame}{En el cliente (nativo)}
+\begin{frame}[fragile]{En el cliente (nativo)}
+  Basta utilizar el elemento \texttt{video}:
+
+\begin{lstlisting}[language=HTML]
+<html>
+<head>
+    <title>Ejemplo con soporte nativo</title>
+</head>
+<body>
+    <video
+        src="http://ejemplo.com/streaming.m3u8"
+        height="300" width="400"
+        >
+    </video>
+</body>
+</html>
+\end{lstlisting}
 \end{frame}
 
 \begin{frame}{En el cliente (\texttt{hls.js})}
+  \begin{center}
+    \includegraphics[scale=0.2]{img/usohls.png}    
+  \end{center}
+\end{frame}
+
+\begin{frame}[fragile]{En el cliente (\texttt{hls.js})}
+\begin{lstlisting}[language=JavaScript]
+var video = document.getElementById('video');
+var hls = new Hls();
+hls.loadSource('http://ejemplo.com/streaming.m3u8');
+hls.attachMedia(video);
+hls.on(Hls.Events.MANIFEST_PARSED,function() {
+  video.play();
+}
+\end{lstlisting}
 \end{frame}
 
 \end{document}
