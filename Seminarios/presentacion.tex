@@ -78,6 +78,7 @@ literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1
   \tableofcontents
 \end{frame}
 
+\section{Características generales}
 \begin{frame}{¿Qué es HLS?}
   HTTP Live Streaming es un protocolo de transmisión de \textbf{streaming} y \textbf{vídeo bajo demanda}.
 
@@ -118,6 +119,8 @@ literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1
   \end{itemize}
 \end{frame}
 
+\section{En el servidor}
+
 \begin{frame}{Codificación y segmentación}
   \includegraphics[scale=0.9]{img/timestamp.png}
 
@@ -125,6 +128,8 @@ literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1
 
   Se generan segmentos cortos (10s) de distintas calidades.
 \end{frame}
+
+\subsection{Archivos de índice}
 
 \begin{frame}[fragile]{Archivos de índice}
   Los segmentos de la misma calidad se ordenan en un \textbf{archivo índice}:
@@ -188,6 +193,8 @@ fileSequence5.ts
 \end{lstlisting}
 \end{frame}
 
+\subsection{Otras características}
+
 \begin{frame}[fragile]{Encriptación} %?
 
 \texttt{EXT-X-KEY} indice la clave a utilizar:
@@ -225,6 +232,8 @@ x.m3u8
 \end{lstlisting}
 \end{frame}
 
+\section{En el cliente}
+
 \begin{frame}[fragile]{En el cliente (nativo)}
   Basta utilizar el elemento \texttt{video}:
 
@@ -246,7 +255,7 @@ x.m3u8
 
 \begin{frame}{En el cliente (\texttt{hls.js})}
   \begin{center}
-    \includegraphics[scale=0.2]{img/usohls.png}    
+    \includegraphics[scale=0.2]{img/usohls.png}
   \end{center}
 \end{frame}
 
