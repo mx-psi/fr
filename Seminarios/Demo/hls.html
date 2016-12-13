@@ -2,8 +2,9 @@
 <script src="hls.min.js"></script>
 <head>
     <title>HTTP Live Streaming Example</title>
+    <meta charset="utf-8"/>
 </head>
-<body>
+<body><center>
     <video id="video" src="demo.m3u8" width="1024" height="576" controls></video>
     <script>
       if(Hls.isSupported()) {
@@ -13,9 +14,26 @@
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED,function() {
           video.play();
-      });
-     }
+          var multiple = hls.levels.length > 1;
+          if (multiple) {
+            calidades = hls.levels.map(function(l) {return l.url[0].substring(l.url[0].lastIndexOf("_")+1,l.url[0].lastIndexOf("."))})
+            var quality = document.getElementById('quality');
+            for (var c = calidades.length; c--; ) {
+              var o = document.createElement('option');
+              o.text = calidades[c];
+              o.value = c;
+              quality.add(o);
+            }
+            setQuality = function(id) {
+               hls.nextLevel = id;
+            }
+          }
+        });
+      }
     </script>
-    </video>
-</body>
+    </video><br>
+    Resolución: <select id="quality" size=1 onChange="setQuality(this.value)">
+      <option value=-1>Auto</option>
+    </select> 
+</center></body>
 </html>
