@@ -8,9 +8,9 @@ vod-%: % clean
 
 #Vídeo bajo demanda en múltiples calidades (nativo, 360p, 144p)
 multivod-%: % clean
-	ffmpeg -i $< $(HLSFLAGS) $(VOD) -b:v 3200k -bufsize 3200k demo_nativa.m3u8
-	ffmpeg -i $< $(HLSFLAGS) $(VOD) -b:v 900k -bufsize 900k -vf scale=-1:360 demo_360p.m3u8
-	ffmpeg -i $< $(HLSFLAGS) $(VOD) -b:v 280k -bufsize 280k -vf scale=-1:144 demo_144p.m3u8
+	ffmpeg -i $< $(HLSFLAGS) $(VOD) -b:v 3200k -bufsize 3200k -vf crop=ih/3*4:ih demo_nativa.m3u8
+	ffmpeg -i $< $(HLSFLAGS) $(VOD) -b:v 900k -bufsize 900k -vf 'crop=ih/3*4:ih,scale=-1:360' demo_360p.m3u8
+	ffmpeg -i $< $(HLSFLAGS) $(VOD) -b:v 280k -bufsize 280k -vf 'crop=ih/3*4:ih,scale=-1:144' demo_144p.m3u8
 	echo #EXTM3U > demo.m3u8
 	echo #EXT-X-STREAM-INF:PROGRAM-ID=1, BANDWIDTH=280000 >> demo.m3u8
 	echo demo_144p.m3u8 >> demo.m3u8
