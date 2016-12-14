@@ -29,11 +29,15 @@
             }
           }
         });
+        hls.on(Hls.Events.FRAG_CHANGED, function() {
+          if (typeof calidades !== undefined)
+            document.getElementById("actual").innerHTML = "Resolución actual: " + calidades[hls.currentLevel]
+        });
       }
     </script>
     </video><br>
-    Resolución: <select id="quality" size=1 onChange="setQuality(this.value)">
+    <p>Resolución: <select id="quality" size=1 onChange="setQuality(this.value)">
       <option value=-1>Auto</option>
-    </select> 
+    </select> <span id="actual"></span></p>
 </center></body>
 </html>
